@@ -7,4 +7,23 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="green">#53CC99</color>
+    <color name="dark_green">#1A6A48</color>
+    <color name="light_grey_transparent">#ADD1D1D1</color>
+    <color name="dark_grey">#3B4147</color>
+    <color name="dark_grey_transparent">#901F1F20</color>
+    <color name="light_grey">#D1D1D1</color>
+    <color name="transparent">#00FFFFFF</color>
+    <color name="click_effect">#2D919090</color>
+    <color name="click_effect1">#1EE0DDDD</color>
+    <color name="gredient_1">#533CC9</color>
+    <color name="gredient_2">#3B4147</color>
+    <color name="emoji_color">#F4D44D</color>
+    <color name="red">#F44336</color>
+    <color name="red_light">#CEED584E</color>
+    <color name="amber">#FFBF00</color>
+    <color name="very_light_grey">#F1F0F0</color>
+    <color name="green_delivery">#00dd5c</color>
+    <color name="pink">#f856a0</color>
+    <color name="light_grey_rft">#D3D9E5</color>
 </resources>

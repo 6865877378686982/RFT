@@ -1,9 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.RFT" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.RFT" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/dark_grey</item>
+        <item name="colorPrimaryVariant">@color/dark_grey</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -12,5 +12,36 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+    </style>
+    <style name="editTextStyle" parent="@style/Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/edit_text_size</item>
+        <item name="android:fontFamily">@font/kollektif_bold</item>
+        <item name="android:imeOptions">flagNoExtractUi</item>
+        <item name="android:textColorHint">@color/light_grey</item>
+    </style>
+    <style name="button_gotham">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/gotham_rounded_bold</item>
+        <item name="android:textSize">@dimen/login_button_size</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="fragment_tittle_white_bold" parent="@style/Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/tittle_size_list</item>
+        <item name="android:fontFamily">@font/kollektif_bold</item>
+    </style>
+    <style name="tv_header_tittle" parent="@style/Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/header_text_tittle</item>
+        <item name="android:fontFamily">@font/kollektif</item>
+    </style>
+
+    <style name="button_kollektif">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/kollektif_bold</item>
+        <item name="android:textSize">@dimen/edit_text_size</item>
+        <item name="textAllCaps">false</item>
     </style>
 </resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="edit_text_size">15sp</dimen>
+    <dimen name="login_button_size">17sp</dimen>
+    <dimen name="task_list_size">14sp</dimen>
+    <dimen name="dialog_text_heading">15sp</dimen>
+    <dimen name="message_date_text">11sp</dimen>
+    <dimen name="no_connection_tv">20sp</dimen>
+    <dimen name="no_datafound_tv">12sp</dimen>
+    <dimen name="tv_timer">28sp</dimen>
+    <dimen name="check_list_status_size">13sp</dimen>
+
+
+
+
+    <!--Main Tittle Size-->
+    <dimen name="tittle_size_list">18sp</dimen>
+    <dimen name="check_list_sub_tittle">16sp</dimen>
+    <dimen name="task_detail_size">22sp</dimen>
+    <dimen name="task_detail_table_text">14sp</dimen>
+    <dimen name="message_text">16sp</dimen>
+    <dimen name="toolbar_tittle">18sp</dimen>
+    <dimen name="header_text_tittle">13sp</dimen>
+    <dimen name="setting_text_value">15sp</dimen>
+    <dimen name="check_list_sub_tittle_head">14sp</dimen>
+
+
+
+
+
+</resources>
