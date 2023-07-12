@@ -28,10 +28,16 @@ var CHECKLIST_QR_PATH = "https://track.zzoota.com/"*/
 /*http://139.99.208.82/api/login?email=Ad@zzoota.com&password=AD@zzoota.com*/
 
 
-/*Testing URL*/
+/*Dev URL*/
 var BASE_URL = "http://20.213.57.167/api/"
 var SOCKET_URL = "http://20.213.57.167:9001"
 var CHECKLIST_QR_PATH = "http://20.213.57.167/"
+var BASE_URL_RFT = "https://admin.zzoota.com/api/"
+
+/*Test URL*/
+/*var BASE_URL = "http://20.211.90.127/api/"
+var SOCKET_URL = "http://20.211.90.127:9001"
+var CHECKLIST_QR_PATH = "http://20.211.90.127/"*/
 
 
 const val USER_DATA = "user_data"
@@ -67,6 +73,7 @@ const val START_BREAK_TIME = "START_BREAK_TIME"
 const val END_BREAK_TIME = "END_BREAK_TIME"
 
 const val SUCCESS_STATUS = 1
+const val SUCCESS_STATUS_EDGE = "success"
 var IS_BREAK_START = false
 var IS_CHECKLIST_FILL = false
 var IS_CHECKLIST_FILL_POSITION = -1

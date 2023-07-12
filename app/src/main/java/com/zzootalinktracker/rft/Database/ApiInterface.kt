@@ -1,13 +1,12 @@
 package com.zzootalinktracker.rft.Database
 
-import android.telecom.Call
-import com.airbnb.lottie.L
+import com.zzootalinktracker.rft.UI.Activity.Model.GetLasLoginDeviceHistoryModel
 import com.zzootalinktracker.rft.UI.Activity.Model.LoginModel
 import com.zzootalinktracker.rft.UI.Activity.Model.UpdateCheck_Response
 import com.zzootalinktracker.rft.UI.Activity.Model.UpdateVehicleAttributeResponse
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
+import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
+import retrofit2.Call
+import retrofit2.http.*
 
 
 interface ApiInterface {
@@ -27,7 +26,14 @@ interface ApiInterface {
             val retrofit = ZzootaLinkClientInstance.retrofitInstance
             return retrofit!!.create(ApiInterface::class.java)
         }
+
+        fun createForRFT(): ApiInterface {
+
+            val retrofit = EdgeClientInstance.retrofitInstance
+            return retrofit!!.create(ApiInterface::class.java)
+        }
     }
+
     @FormUrlEncoded
     @POST("store_ailloy_login_logs")
     fun insertDeviceLoginHistroy(
@@ -36,8 +42,15 @@ interface ApiInterface {
         @Field("last_login_time") last_login_time: String,
         @Field("version_name") version_name: String,
         @Field("sygic_app_version") sygic_app_version: String,
-        @Field("device_id") device_id: String
-    ): retrofit2.Call<UpdateCheck_Response>
+        @Field("device_id") device_id: String,
+        @Field("user_id") user_id: String,
+    ): Call<UpdateCheck_Response>
+
+    @GET("get_last_login_device_history")
+    fun getLastLoginDeviceHistory(
+        @Query("user_api_hash") user_api_hash: String,
+        @Query("device_id") device_id: String
+    ): Call<GetLasLoginDeviceHistoryModel>
 
     @FormUrlEncoded
     @POST("update_user_timezone")
@@ -46,6 +59,16 @@ interface ApiInterface {
         @Field("time_zone") time_zone: String,
         @Field("user_id") user_id: String
     ): retrofit2.Call<UpdateVehicleAttributeResponse>
+
+
+
+    // Get Trailer, Tags & Status
+
+    @GET("RFT/TrailerTagsAndStatus")
+    fun getTrailerTagsStatus(
+        @Query("Key") Key: String,
+        @Query("RFTDriverId") RFTDriverId: String
+    ): Call<GetTrailerTagsStatusModel>
 
     /*Get Docket List*/
 //    @GET("h4h/get_dockets")
