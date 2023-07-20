@@ -23,22 +23,23 @@ import java.util.*
 /*LIVE URL*/
 /*var BASE_URL = "https://139.99.208.82/api/"
 var SOCKET_URL = "http://139.99.208.82:9001"
+var BASE_URL_RFT = "https://admin.zzoota.com/api/"
 var CHECKLIST_QR_PATH = "https://track.zzoota.com/"*/
 
 /*http://139.99.208.82/api/login?email=Ad@zzoota.com&password=AD@zzoota.com*/
 
 
 /*Dev URL*/
-var BASE_URL = "http://20.213.57.167/api/"
+/*var BASE_URL = "http://20.213.57.167/api/"
 var SOCKET_URL = "http://20.213.57.167:9001"
 var CHECKLIST_QR_PATH = "http://20.213.57.167/"
-var BASE_URL_RFT = "https://admin.zzoota.com/api/"
+var BASE_URL_RFT = "https://admin.zzoota.com/api/"*/
 
 /*Test URL*/
-/*var BASE_URL = "http://20.211.90.127/api/"
+var BASE_URL = "http://20.211.90.127/api/"
 var SOCKET_URL = "http://20.211.90.127:9001"
-var CHECKLIST_QR_PATH = "http://20.211.90.127/"*/
-
+var CHECKLIST_QR_PATH = "http://20.211.90.127/"
+var BASE_URL_RFT = "https://admin.zzoota.com/api/"
 
 const val USER_DATA = "user_data"
 const val E_MAIL = "email"
@@ -52,6 +53,7 @@ const val NOTIFICATION_REMAINING_TIME = "notification_remaining_time"
 const val DEVICE_NAME = "device_name"
 const val DEVICE_ID = "device_id"
 const val USER_ID = "user_id"
+const val RFT_DRIVER_ID = "rft_driver_id"
 const val POSITION_PERMISSION = "POSITION_PERMISSION"
 const val CHAT_COUNT = "chat_count"
 const val JOB_COUNT = "job_count"
@@ -106,7 +108,25 @@ fun isOnline(context: Context): Boolean {
     }
     return false
 }
+fun getDataFormatForEdge(): SimpleDateFormat {
+    return SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+}
 
+
+
+fun getCurrentDateForEdge(): String {
+    val currentDate: String =
+        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+    return "$currentDate"
+}
+
+fun getCalculatedDate(days: Int): String {
+    val cal = Calendar.getInstance()
+    val s = getDataFormatForEdge()
+    cal.add(Calendar.DAY_OF_YEAR, days)
+    return s.format(Date(cal.timeInMillis))
+}
 public fun checkLocationEnabled(context: Context): Boolean {
     val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     return manager.isProviderEnabled(LocationManager.GPS_PROVIDER)

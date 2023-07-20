@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,32 +16,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.*
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
-import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.Database.SessionManagerEmailSave
 import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.Service.GetTrailerTagStatusService
 import com.zzootalinktracker.rft.UI.Activity.Adapter.ChillerAdapter
-import com.zzootalinktracker.rft.UI.Activity.LoginActivity
-import com.zzootalinktracker.rft.UI.Activity.Model.ChillerModel
-import com.zzootalinktracker.rft.UI.Activity.Model.GetLasLoginDeviceHistoryModel
-import com.zzootalinktracker.rft.UI.Activity.Model.PadModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
-import com.zzootalinktracker.rft.Utils.E_MAIL
-import com.zzootalinktracker.rft.Utils.SUCCESS_STATUS
-import com.zzootalinktracker.rft.Utils.SUCCESS_STATUS_EDGE
 import com.zzootalinktracker.rft.Utils.isOnline
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import kotlin.collections.ArrayList
 
 
@@ -47,11 +38,15 @@ class HomeFragment : Fragment(), View.OnClickListener {
     private lateinit var rvChiller: RecyclerView
     private lateinit var tvDriverName: TextView
     private lateinit var btnLogout: ImageView
+    private lateinit var mainLayoutHomeFragment: RelativeLayout
+    private lateinit var noInternetLayoutHomeFragment: RelativeLayout
+    private lateinit var noDataLayoutHomeFragment: RelativeLayout
     private lateinit var sessionManagerEmailSave: SessionManagerEmailSave
     private lateinit var sessionManager: SessionManager
     private lateinit var trailerList: ArrayList<GetTrailerTagsStatusModel.Data>
     private lateinit var service: GetTrailerTagStatusService
     private lateinit var adapter: ChillerAdapter
+    private lateinit var progressBar: ProgressBar
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -63,7 +58,12 @@ class HomeFragment : Fragment(), View.OnClickListener {
         sessionManagerEmailSave = SessionManagerEmailSave(context!!)
         sessionManager = SessionManager(context!!)
         rvChiller = viewLayout.findViewById(R.id.rvChiller)
+        mainLayoutHomeFragment = viewLayout.findViewById(R.id.mainLayoutHomeFragment)
+        noInternetLayoutHomeFragment = viewLayout.findViewById(R.id.noInternetLayoutHomeFragment)
+        noDataLayoutHomeFragment = viewLayout.findViewById(R.id.noDataLayoutHomeFragment)
         btnLogout = viewLayout.findViewById(R.id.btnLogout)
+        progressBar = viewLayout.findViewById(R.id.progressBar)
+        progressBar.visibility = View.GONE
         btnLogout.setOnClickListener(this)
         tvDriverName = viewLayout.findViewById(R.id.tvDriverName)
         tvDriverName.text = "Hi," + sessionManagerEmailSave.getEmail()
@@ -72,6 +72,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
         adapter = ChillerAdapter(context!!,trailerList)
         rvChiller.adapter = adapter
         startTrailerTagStatusService()
+        changeProgressColor()
 
         return viewLayout
     }
@@ -79,34 +80,67 @@ class HomeFragment : Fragment(), View.OnClickListener {
     private val trailerStatusReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         @SuppressLint("NotifyDataSetChanged")
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == "TRAILER_STATUS_UPDATE") {
-                val inentData = intent.getStringExtra("trailerList")
-                val gson = Gson()
-                var model = gson.fromJson(inentData, GetTrailerTagsStatusModel::class.java)
-                trailerList.clear()
-                trailerList.addAll(model.data)
-                adapter.notifyDataSetChanged()
-                Log.e("trailerLlist", "trailerLlist")
+            if (isOnline(context)){
+                noInternetLayoutHomeFragment.visibility = View.GONE
+                mainLayoutHomeFragment.visibility = View.VISIBLE
+                if (intent.action == "TRAILER_STATUS_UPDATE") {
+                    val intentData = intent.getStringExtra("trailerList")
+                    val gson = Gson()
+                    var model = gson.fromJson(intentData, GetTrailerTagsStatusModel::class.java)
+                    trailerList.clear()
+                    trailerList.addAll(model.data)
+                    progressBar.visibility = View.GONE
+                    adapter.notifyDataSetChanged()
+                    Log.e("trailerLlist", "trailerLlist")
 
 
+
+
+                }
+            }else{
+                noInternetLayoutHomeFragment.visibility = View.VISIBLE
+                mainLayoutHomeFragment.visibility = View.GONE
             }
+
         }
     }
 
-    private fun startTrailerTagStatusService() {
-        try {
-            if (!isMyServiceRunning(GetTrailerTagStatusService::class.java)) {
-                val i = Intent(requireContext(), GetTrailerTagStatusService::class.java)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    /*    requireContext().startForegroundService(i)*/
-                    requireContext().startService(i)
-                } else {
-                    requireContext().startService(i)
-                }
-            }
-        } catch (e: Exception) {
+    private fun changeProgressColor(){
+        val progressColor = resources.getColor(R.color.red_rft)
+        val colorFilter = PorterDuffColorFilter(progressColor, PorterDuff.Mode.SRC_IN)
+        progressBar.indeterminateDrawable.colorFilter = colorFilter
+    }
 
+    override fun onResume() {
+        super.onResume()
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun startTrailerTagStatusService() {
+        if (isOnline(context!!)){
+            noInternetLayoutHomeFragment.visibility = View.GONE
+            mainLayoutHomeFragment.visibility = View.VISIBLE
+            try {
+                if (!isMyServiceRunning(GetTrailerTagStatusService::class.java)) {
+                    val i = Intent(requireContext(), GetTrailerTagStatusService::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        /*    requireContext().startForegroundService(i)*/
+//
+                        progressBar.visibility = View.VISIBLE
+                        requireContext().startService(i)
+                    } else {
+
+                        requireContext().startService(i)
+                    }
+                }
+            } catch (e: Exception) {
+
+            }
+        }else{
+            noInternetLayoutHomeFragment.visibility = View.VISIBLE
+            mainLayoutHomeFragment.visibility = View.GONE
         }
+
     }
 
     private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {

@@ -29,6 +29,20 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".UI.Activity.NoInternetScreen"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".UI.Activity.Adapter.DeviceNotConfiguredScreen"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".MainActivity"
             android:exported="false"
             android:launchMode="singleInstance">
@@ -66,12 +80,10 @@
                 android:value="" />
         </activity>
 
-
         <service
             android:name=".Service.GetTrailerTagStatusService"
             android:enabled="true"
             android:exported="true" />
-
     </application>
 
 </manifest>

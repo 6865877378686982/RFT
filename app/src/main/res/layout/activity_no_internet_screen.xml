@@ -4,12 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.zzootalinktracker.android.Ui.Activity.SplashActivity">
-<RelativeLayout
-    android:id="@+id/noInternetLayoutSplash"
-    android:visibility="gone"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    tools:context=".UI.Activity.NoInternetScreen">
+
     <ImageView
         android:id="@+id/ivNoInternet"
         android:layout_width="180sp"
@@ -25,19 +21,5 @@
         android:layout_below="@id/ivNoInternet"
         android:layout_marginTop="20sp"
         android:text="No Internet Connection Found! Please Check Your Internet" />
-
-</RelativeLayout>
-    <RelativeLayout
-        android:id="@+id/mainLayoutSplash"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="300sp"
-            android:layout_height="300sp"
-            android:layout_centerInParent="true"
-            app:srcCompat="@drawable/app_logo_square" />
-    </RelativeLayout>
-
 
 </RelativeLayout>

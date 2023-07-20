@@ -1,9 +1,7 @@
 package com.zzootalinktracker.rft.Database
 
-import com.zzootalinktracker.rft.UI.Activity.Model.GetLasLoginDeviceHistoryModel
-import com.zzootalinktracker.rft.UI.Activity.Model.LoginModel
-import com.zzootalinktracker.rft.UI.Activity.Model.UpdateCheck_Response
-import com.zzootalinktracker.rft.UI.Activity.Model.UpdateVehicleAttributeResponse
+import com.zzootalinktracker.rft.UI.Activity.Model.*
+import com.zzootalinktracker.rft.UI.Fragment.Model.GetTagsStatusHistoryModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 import retrofit2.Call
 import retrofit2.http.*
@@ -69,6 +67,22 @@ interface ApiInterface {
         @Query("Key") Key: String,
         @Query("RFTDriverId") RFTDriverId: String
     ): Call<GetTrailerTagsStatusModel>
+
+
+    @GET("rft_login")
+    fun rftLogin(
+        @Query("imei") imei: String,
+        @Query("versionAbove28") versionAbove28: Int
+    ): Call<RftLoginModel>
+
+    @GET("RFT/TagsStatusHistory")
+    fun getTagsStatusHistory(
+        @Query("Key") Key: String,
+        @Query("RFTDriverId") RFTDriverId: String,
+        @Query("StartDate") StartDate: String,
+        @Query("EndDate") EndDate: String
+
+    ): Call<GetTagsStatusHistoryModel>
 
     /*Get Docket List*/
 //    @GET("h4h/get_dockets")

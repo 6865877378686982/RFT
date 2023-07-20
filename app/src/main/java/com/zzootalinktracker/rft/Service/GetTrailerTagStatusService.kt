@@ -9,6 +9,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
 import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.UI.Activity.Adapter.ChillerAdapter
+import com.zzootalinktracker.rft.UI.Activity.NoInternetScreen
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 
 import com.zzootalinktracker.rft.Utils.SUCCESS_STATUS_EDGE
@@ -97,6 +98,9 @@ class GetTrailerTagStatusService : Service() {
                 }
 
 
+            }else{
+              /*  val intent = Intent(this,NoInternetScreen::class.java)
+                startActivity(intent)*/
             }
 
         } catch (e: Exception) {
