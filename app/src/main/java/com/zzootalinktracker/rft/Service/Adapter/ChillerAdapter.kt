@@ -1,4 +1,4 @@
-package com.zzootalinktracker.rft.UI.Activity.Adapter
+package com.zzootalinktracker.rft.Service.Adapter
 
 import android.animation.ObjectAnimator
 import android.content.Context

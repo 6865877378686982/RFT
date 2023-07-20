@@ -28,7 +28,7 @@ import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.Database.SessionManagerEmailSave
 import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.Service.GetTrailerTagStatusService
-import com.zzootalinktracker.rft.UI.Activity.Adapter.ChillerAdapter
+import com.zzootalinktracker.rft.Service.Adapter.ChillerAdapter
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 import com.zzootalinktracker.rft.Utils.isOnline
 import kotlin.collections.ArrayList

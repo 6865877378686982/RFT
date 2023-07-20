@@ -8,7 +8,7 @@ import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
 import com.zzootalinktracker.rft.Database.ApiInterface
-import com.zzootalinktracker.rft.UI.Activity.Adapter.ChillerAdapter
+import com.zzootalinktracker.rft.Service.Adapter.ChillerAdapter
 import com.zzootalinktracker.rft.UI.Activity.NoInternetScreen
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 

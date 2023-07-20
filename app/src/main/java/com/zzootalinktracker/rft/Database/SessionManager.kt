@@ -84,45 +84,9 @@ class SessionManager {
     }
 
 
-    public fun getLoginData(): LoginModel? {
-        val data = getStringData(USER_DATA)
-        if (data != "") {
-            var gson = Gson()
-            var loginModel = gson.fromJson(data, LoginModel::class.java)
-            return loginModel
-        }
-        return null
-    }
 
-    public fun getChatCount(): String {
-        val data = getStringData(CHAT_COUNT)
-        return data
 
-    }
 
-    public fun saveChatCount(count: String) {
-        saveStringData(CHAT_COUNT, count)
-    }
-
-    public fun saveJobCount(count: String) {
-        saveStringData(JOB_COUNT, count)
-    }
-
-    public fun getJobCount(): String {
-        val data = getStringData(JOB_COUNT)
-        return data
-
-    }
-
-    public fun saveSendSmsDocketInfo(value: String) {
-        saveStringData(SMS_DOCKET_STATUS, value)
-    }
-
-    public fun getSendSmsDocketInfo(): String {
-        val data = getStringData(SMS_DOCKET_STATUS)
-        return data
-
-    }
 
 
     public fun saveIMEI(count: String) {
@@ -171,21 +135,14 @@ class SessionManager {
         return data
     }
 
+    public fun saveLoginTimeStamp(count: String) {
+        saveStringData(LOGIN_TIMESTAMP, count)
+    }
 
-/*    public fun saveNotificationWarnings(key_name: String, data: BreakFatugueNotification) {
-        val gson = Gson()
-        val jsonObject = gson.toJson(data)
-        saveStringData(key_name, jsonObject)
-    }*/
-/*
-    public fun getNotificatonData(key_name: String): BreakFatugueNotification? {
-        val data = getStringData(key_name)
-        if (data != "") {
-            val gson = Gson()
-            val deviceModel = gson.fromJson(data, BreakFatugueNotification::class.java)
-            return deviceModel
-        }
-        return null
-    }*/
+    public fun getLoginTimeStamp(): String {
+        val data = getStringData(LOGIN_TIMESTAMP)
+        return data
+    }
+
 
 }

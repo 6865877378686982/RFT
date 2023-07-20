@@ -36,7 +36,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".UI.Activity.Adapter.DeviceNotConfiguredScreen"
+            android:name=".Service.Adapter.DeviceNotConfiguredScreen"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
