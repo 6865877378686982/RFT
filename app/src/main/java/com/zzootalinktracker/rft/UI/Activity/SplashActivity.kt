@@ -192,20 +192,20 @@ class SplashActivity : AppCompatActivity() {
                                             startActivity(intent)
                                         } else {
                                             // show new screen - msg => your device is not configured
-                                            goToDeviceNotConfiguredScreen(getString(R.string.user_not_configured))
+                                            goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
                                         }
                                     } else {
                                         // show new screen - msg => your device is not configured
-                                        goToDeviceNotConfiguredScreen(getString(R.string.device_not_confgured))
+                                        goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
                                     }
                                 }else{
-                                    goToDeviceNotConfiguredScreen(getString(R.string.device_not_confgured))
+                                    goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
                                 }
 
                             }
 
                             override fun onFailure(call: Call<RftLoginModel>, t: Throwable) {
-                                goToDeviceNotConfiguredScreen(getString(R.string.server_stopped))
+                                goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
                             }
 
 
