@@ -32,16 +32,12 @@ import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Suppress("DEPRECATED_IDENTITY_EQUALS")
-@SuppressLint("CustomSplashScreen")
+
 class SplashActivity : AppCompatActivity() {
 
-    private val PREFS_NAME = "MyPrefs"
-    private val LAST_ACTIVITY_KEY = "lastActivity"
 
     private lateinit var sessionManager: SessionManager
     private lateinit var noInternetLayoutSplash: RelativeLayout
-    private lateinit var mainLayoutSplash: RelativeLayout
     private lateinit var sessionManagerEmailSave: SessionManagerEmailSave
 
 
@@ -55,9 +51,7 @@ class SplashActivity : AppCompatActivity() {
 
     private fun initView() {
         sessionManager = SessionManager(applicationContext)
-        noInternetLayoutSplash = findViewById(R.id.noInternetLayoutSplash)
         sessionManagerEmailSave = SessionManagerEmailSave(applicationContext)
-        mainLayoutSplash = findViewById(R.id.mainLayoutSplash)
 
         askRequestsPermission()
     }
@@ -65,52 +59,22 @@ class SplashActivity : AppCompatActivity() {
 
     private fun askRequestsPermission() {
         if (ContextCompat.checkSelfPermission(
-                this@SplashActivity, Manifest.permission.ACCESS_FINE_LOCATION
-            ) !== PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                this@SplashActivity, Manifest.permission.CAMERA
-            ) !== PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                this@SplashActivity, Manifest.permission.ACCESS_COARSE_LOCATION
-            ) !== PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
                 this@SplashActivity, Manifest.permission.READ_PHONE_STATE
-            ) !== PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                this@SplashActivity, Manifest.permission.READ_EXTERNAL_STORAGE
-            ) !== PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                this@SplashActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) !== PackageManager.PERMISSION_GRANTED
         ) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this@SplashActivity, Manifest.permission.ACCESS_FINE_LOCATION
-                ) || ActivityCompat.shouldShowRequestPermissionRationale(
-                    this@SplashActivity, Manifest.permission.CAMERA
-                ) || ActivityCompat.shouldShowRequestPermissionRationale(
-                    this@SplashActivity, Manifest.permission.ACCESS_COARSE_LOCATION
-                ) || ActivityCompat.shouldShowRequestPermissionRationale(
                     this@SplashActivity, Manifest.permission.READ_PHONE_STATE
-                ) || ActivityCompat.shouldShowRequestPermissionRationale(
-                    this@SplashActivity, Manifest.permission.READ_EXTERNAL_STORAGE
-                ) || ActivityCompat.shouldShowRequestPermissionRationale(
-                    this@SplashActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
             ) {
                 ActivityCompat.requestPermissions(
                     this@SplashActivity, arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.READ_PHONE_STATE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_PHONE_STATE
                     ), 1001
                 )
             } else {
                 ActivityCompat.requestPermissions(
                     this@SplashActivity, arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.READ_PHONE_STATE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_PHONE_STATE
                     ), 1001
                 )
             }
@@ -129,20 +93,10 @@ class SplashActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             1001 -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED && grantResults[3] == PackageManager.PERMISSION_GRANTED && grantResults[4] == PackageManager.PERMISSION_GRANTED && grantResults[5] == PackageManager.PERMISSION_GRANTED) {
-                    if ((ContextCompat.checkSelfPermission(
-                            this@SplashActivity, Manifest.permission.ACCESS_FINE_LOCATION
-                        ) === PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
-                            this@SplashActivity, Manifest.permission.CAMERA
-                        ) === PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
-                            this@SplashActivity, Manifest.permission.ACCESS_COARSE_LOCATION
-                        ) === PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (((ContextCompat.checkSelfPermission(
                             this@SplashActivity, Manifest.permission.READ_PHONE_STATE
-                        ) === PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
-                            this@SplashActivity, Manifest.permission.READ_EXTERNAL_STORAGE
-                        ) === PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
-                            this@SplashActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        ) === PackageManager.PERMISSION_GRANTED)
+                        ) === PackageManager.PERMISSION_GRANTED))
 
                     ) {
                         getIMEI()
@@ -160,7 +114,7 @@ class SplashActivity : AppCompatActivity() {
 
     @SuppressLint("MissingPermission", "HardwareIds")
     private fun getIMEI() {
-        Log.e("screen123","getImei")
+
         val version = Build.VERSION.SDK_INT
         try {
             val telephonyManager =
@@ -182,7 +136,7 @@ class SplashActivity : AppCompatActivity() {
                 checkLoginExist()
             }
         } catch (e: Exception) {
-
+            Log.e("splash", e.message.toString())
         }
     }
 
@@ -197,7 +151,6 @@ class SplashActivity : AppCompatActivity() {
     private fun rftLogin() {
         try {
             if (isOnline(applicationContext)) {
-                mainLayoutSplash.visibility = View.VISIBLE
                 noInternetLayoutSplash.visibility = View.GONE
                 try {
                     val version = Build.VERSION.SDK_INT
@@ -216,7 +169,7 @@ class SplashActivity : AppCompatActivity() {
                                     if (response.body()!!.status == SUCCESS_STATUS) {
                                         if (response.body()!!.data.active == 0) {
                                             // show new screen -> msg => Please active device from link
-                                            goToDeviceNotConfiguredScreen("Please active device from link")
+                                            goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
                                             return
                                         }
                                         val rftDriver = response.body()!!.data.rft_driver
@@ -239,41 +192,40 @@ class SplashActivity : AppCompatActivity() {
                                             startActivity(intent)
                                         } else {
                                             // show new screen - msg => your device is not configured
-                                            goToDeviceNotConfiguredScreen("User is not configured with this device")
+                                            goToDeviceNotConfiguredScreen(getString(R.string.user_not_configured))
                                         }
-
                                     } else {
                                         // show new screen - msg => your device is not configured
-                                        goToDeviceNotConfiguredScreen("Your device is not configured")
-
+                                        goToDeviceNotConfiguredScreen(getString(R.string.device_not_confgured))
                                     }
+                                }else{
+                                    goToDeviceNotConfiguredScreen(getString(R.string.device_not_confgured))
                                 }
 
                             }
 
                             override fun onFailure(call: Call<RftLoginModel>, t: Throwable) {
-
+                                goToDeviceNotConfiguredScreen(getString(R.string.server_stopped))
                             }
 
 
                         })
                 } catch (e: Exception) {
-
+                    goToDeviceNotConfiguredScreen(NO_INTERNET)
                 }
             } else {
-                mainLayoutSplash.visibility = View.GONE
-                noInternetLayoutSplash.visibility = View.VISIBLE
+
             }
         } catch (e: Exception) {
 
         }
     }
 
-    private fun goToDeviceNotConfiguredScreen(msg: String) {
+    private fun goToDeviceNotConfiguredScreen(type:Int) {
         val intent = Intent(
             this@SplashActivity, DeviceNotConfiguredScreen::class.java
         )
-        intent.putExtra("msg", msg)
+        intent.putExtra("type", type)
         startActivity(intent)
     }
 

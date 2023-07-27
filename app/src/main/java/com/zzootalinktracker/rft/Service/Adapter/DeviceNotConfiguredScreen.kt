@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import com.zzootalinktracker.rft.R
+import com.zzootalinktracker.rft.Utils.NO_INTERNET
+import com.zzootalinktracker.rft.Utils.NO_SERVER
 
 class DeviceNotConfiguredScreen : AppCompatActivity() {
 
@@ -19,8 +21,17 @@ class DeviceNotConfiguredScreen : AppCompatActivity() {
         setContentView(R.layout.activity_devive_not_configured_screen)
 
         tvNoDeviceFoundMsg = findViewById(R.id.tvNoDeviceFoundMsg)
-        val msg = intent.extras!!.getString("msg")
-        tvNoDeviceFoundMsg.text = msg
-        Log.e("device","device")
+        val type = intent.extras!!.getInt("type")
+        when(type){
+            NO_INTERNET ->{
+
+            }
+            NO_SERVER ->{
+
+            }
+
+        }
+
+
     }
 }

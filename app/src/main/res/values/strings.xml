@@ -4,6 +4,9 @@
     <string name="password">Password</string>
     <string name="sign_in">Sign In</string>
     <string name="retry">Retry</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="deactive_device">Your Device is Deactivated From Link,\n Please Ask your manager to Active this device.</string>
+    <string name="device_not_confgured">Your Device is IMEI/Android Id not configured in Link.</string>
+    <string name="server_stopped">An Error Occured While Loading \n Please try again!</string>
+    <string name="user_not_configured">User has not been configured with this device, Please ask you manager to configue it and then restart!</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

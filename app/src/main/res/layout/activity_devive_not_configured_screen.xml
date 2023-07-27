@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".Service.Adapter.DeviceNotConfiguredScreen">
 
+
+
     <ImageView
         android:id="@+id/ivNoDeviceFound"
         android:layout_width="180sp"

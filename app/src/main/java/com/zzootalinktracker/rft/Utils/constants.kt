@@ -24,16 +24,18 @@ import java.util.*
 var BASE_URL = "http://20.211.90.127/api/"
 var BASE_URL_RFT = "https://admin.zzoota.com/api/"
 
-const val USER_DATA = "user_data"
 const val LOGIN_TIMESTAMP = "logintimestamp"
 const val API_HASH = "api_hash"
 const val DEVICE_ID = "device_id"
 const val USER_ID = "user_id"
 const val RFT_DRIVER_ID = "rft_driver_id"
-const val CHAT_COUNT = "chat_count"
-const val JOB_COUNT = "job_count"
-const val SMS_DOCKET_STATUS = "SMS_DOCKET_STATUS"
 const val IMEI_ID = "IMEI_ID"
+
+/*For Server States*/
+const val NO_INTERNET = 1
+const val NO_SERVER = 2
+const val DEACTIVE_DEVICE = 3
+
 
 
 const val SUCCESS_STATUS = 1
