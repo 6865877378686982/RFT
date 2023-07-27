@@ -5,8 +5,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object ZzootaLinkClientInstance {
     private var BASE_URL = com.zzootalinktracker.rft.Utils.BASE_URL
-
-    // *** COMMENT THE LINES BELOW WHEN USING APPROOV ***
     private var retrofit: Retrofit? = null
     @JvmStatic
     val retrofitInstance: Retrofit?

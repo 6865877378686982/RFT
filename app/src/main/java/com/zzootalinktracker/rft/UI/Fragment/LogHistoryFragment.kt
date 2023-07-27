@@ -1,35 +1,28 @@
 package com.zzootalinktracker.rft.UI.Fragment
 
-import TrailerAdapter
-import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.R
-import com.zzootalinktracker.rft.UI.Activity.Model.TrailerModel
-import com.zzootalinktracker.rft.UI.Activity.NoInternetScreen
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTagsStatusHistoryModel
 import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
 import java.util.*
 
 
-class LogHistoryFragment : Fragment() {
+class LogHistoryFragment() : Fragment() {
     private lateinit var recycler_view: RecyclerView
     private lateinit var sessionManager: SessionManager
     private lateinit var spinner: Spinner

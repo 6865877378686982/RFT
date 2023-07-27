@@ -34,19 +34,17 @@ import com.zzootalinktracker.rft.Utils.isOnline
 import kotlin.collections.ArrayList
 
 
-class HomeFragment : Fragment(), View.OnClickListener {
+class HomeFragment() : Fragment(), View.OnClickListener {
+
+
     private lateinit var rvChiller: RecyclerView
     private lateinit var tvDriverName: TextView
-    private lateinit var btnLogout: ImageView
     private lateinit var mainLayoutHomeFragment: RelativeLayout
-    private lateinit var noInternetLayoutHomeFragment: RelativeLayout
-    private lateinit var noDataLayoutHomeFragment: RelativeLayout
-    private lateinit var sessionManagerEmailSave: SessionManagerEmailSave
     private lateinit var sessionManager: SessionManager
     private lateinit var trailerList: ArrayList<GetTrailerTagsStatusModel.Data>
-    private lateinit var service: GetTrailerTagStatusService
     private lateinit var adapter: ChillerAdapter
     private lateinit var progressBar: ProgressBar
+    private lateinit var viewLayout: View
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -54,58 +52,60 @@ class HomeFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
 
-        val viewLayout = inflater.inflate(R.layout.fragment_home, container, false)
-        sessionManagerEmailSave = SessionManagerEmailSave(context!!)
-        sessionManager = SessionManager(context!!)
-        rvChiller = viewLayout.findViewById(R.id.rvChiller)
-        mainLayoutHomeFragment = viewLayout.findViewById(R.id.mainLayoutHomeFragment)
-        noInternetLayoutHomeFragment = viewLayout.findViewById(R.id.noInternetLayoutHomeFragment)
-        noDataLayoutHomeFragment = viewLayout.findViewById(R.id.noDataLayoutHomeFragment)
-        btnLogout = viewLayout.findViewById(R.id.btnLogout)
-        progressBar = viewLayout.findViewById(R.id.progressBar)
-        progressBar.visibility = View.GONE
-        btnLogout.setOnClickListener(this)
-        tvDriverName = viewLayout.findViewById(R.id.tvDriverName)
-        tvDriverName.text = "Hi," + sessionManagerEmailSave.getEmail()
-        rvChiller.layoutManager = LinearLayoutManager(context!!)
-        trailerList = ArrayList()
-        adapter = ChillerAdapter(context!!,trailerList)
-        rvChiller.adapter = adapter
-        startTrailerTagStatusService()
-        changeProgressColor()
+        viewLayout = inflater.inflate(R.layout.fragment_home, container, false)
+        initView()
+
+
 
         return viewLayout
+    }
+
+    private fun initView() {
+        try {
+            sessionManager = SessionManager(context!!)
+            rvChiller = viewLayout.findViewById(R.id.rvChiller)
+            mainLayoutHomeFragment = viewLayout.findViewById(R.id.mainLayoutHomeFragment)
+            progressBar = viewLayout.findViewById(R.id.progressBar)
+            progressBar.visibility = View.GONE
+            tvDriverName = viewLayout.findViewById(R.id.tvDriverName)
+
+            tvDriverName.text = "Hi, " + sessionManager.getUserEmail()
+            rvChiller.layoutManager = LinearLayoutManager(context!!)
+
+            setAdapter()
+        } catch (e: Exception) {
+            Log.e("HomeFragment", e.message.toString())
+        }
+    }
+
+    private fun setAdapter() {
+        try {
+            trailerList = ArrayList()
+            adapter = ChillerAdapter(context!!, trailerList)
+            rvChiller.adapter = adapter
+            changeProgressColor()
+        } catch (e: Exception) {
+            Log.e("HomeFragment", e.message.toString())
+        }
+
     }
 
     private val trailerStatusReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         @SuppressLint("NotifyDataSetChanged")
         override fun onReceive(context: Context, intent: Intent) {
-            if (isOnline(context)){
-                noInternetLayoutHomeFragment.visibility = View.GONE
-                mainLayoutHomeFragment.visibility = View.VISIBLE
-                if (intent.action == "TRAILER_STATUS_UPDATE") {
-                    val intentData = intent.getStringExtra("trailerList")
-                    val gson = Gson()
-                    var model = gson.fromJson(intentData, GetTrailerTagsStatusModel::class.java)
-                    trailerList.clear()
-                    trailerList.addAll(model.data)
-                    progressBar.visibility = View.GONE
-                    adapter.notifyDataSetChanged()
-                    Log.e("trailerLlist", "trailerLlist")
-
-
-
-
-                }
-            }else{
-                noInternetLayoutHomeFragment.visibility = View.VISIBLE
-                mainLayoutHomeFragment.visibility = View.GONE
+            if (intent.action == "TRAILER_STATUS_UPDATE") {
+                val intentData = intent.getStringExtra("trailerList")
+                val gson = Gson()
+                val model = gson.fromJson(intentData, GetTrailerTagsStatusModel::class.java)
+                trailerList.clear()
+                trailerList.addAll(model.data)
+                progressBar.visibility = View.GONE
+                adapter.notifyDataSetChanged()
             }
-
         }
     }
 
-    private fun changeProgressColor(){
+    private fun changeProgressColor() {
         val progressColor = resources.getColor(R.color.red_rft)
         val colorFilter = PorterDuffColorFilter(progressColor, PorterDuff.Mode.SRC_IN)
         progressBar.indeterminateDrawable.colorFilter = colorFilter
@@ -114,48 +114,6 @@ class HomeFragment : Fragment(), View.OnClickListener {
     override fun onResume() {
         super.onResume()
         progressBar.visibility = View.VISIBLE
-    }
-
-    private fun startTrailerTagStatusService() {
-        if (isOnline(context!!)){
-            noInternetLayoutHomeFragment.visibility = View.GONE
-            mainLayoutHomeFragment.visibility = View.VISIBLE
-            try {
-                if (!isMyServiceRunning(GetTrailerTagStatusService::class.java)) {
-                    val i = Intent(requireContext(), GetTrailerTagStatusService::class.java)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        /*    requireContext().startForegroundService(i)*/
-//
-                        progressBar.visibility = View.VISIBLE
-                        requireContext().startService(i)
-                    } else {
-
-                        requireContext().startService(i)
-                    }
-                }
-            } catch (e: Exception) {
-
-            }
-        }else{
-            noInternetLayoutHomeFragment.visibility = View.VISIBLE
-            mainLayoutHomeFragment.visibility = View.GONE
-        }
-
-    }
-
-    private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {
-        try {
-            val context = requireContext()
-            val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-                if (serviceClass.name == service.service.className) {
-                    return true
-                }
-            }
-        } catch (e: Exception) {
-            return false
-        }
-        return false
     }
 
 
@@ -173,12 +131,6 @@ class HomeFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
-        when (v) {
-            btnLogout -> {
-                /* var intent = Intent(context,LoginActivity::class.java)
-                 startActivity(intent)*/
-                sessionManager.logOut()
-            }
-        }
+
     }
 }

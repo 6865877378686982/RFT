@@ -1,86 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".UI.Fragment.HomeFragment">
 
     <ProgressBar
-        android:progressDrawable="@drawable/progress_bar_color"
-        android:visibility="gone"
-        android:layout_centerInParent="true"
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:progressDrawable="@drawable/progress_bar_color"
+        android:visibility="visible">
 
     </ProgressBar>
-
-
-    <RelativeLayout
-        android:id="@+id/noInternetLayoutHomeFragment"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ImageView
-            android:id="@+id/ivNoInternet"
-            android:layout_width="180sp"
-            android:layout_height="180sp"
-            android:layout_centerInParent="true"
-            android:src="@drawable/smartphone" />
-
-        <TextView
-            style="@style/black_bold_24sp"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/ivNoInternet"
-            android:layout_marginTop="20sp"
-            android:text="No Internet Connection Found! Please Check Your Internet" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/noDataLayoutHomeFragment"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ImageView
-            android:id="@+id/ivNoDataFound"
-            android:layout_width="180sp"
-            android:layout_height="180sp"
-            android:layout_centerInParent="true"
-            android:src="@drawable/no_data" />
-
-        <TextView
-            style="@style/black_bold_24sp"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/ivNoDataFound"
-            android:layout_marginTop="20sp"
-            android:text="No Internet Connection Found! Please Check Your Internet" />
-
-    </RelativeLayout>
-
 
 
     <RelativeLayout
         android:id="@+id/mainLayoutHomeFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
 
-
-
             <LinearLayout
                 android:layout_width="match_parent"
-                android:orientation="vertical"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/my_toolbar"
@@ -102,79 +53,60 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:layout_marginStart="10sp"
-                            android:text="Hello John" />
-
-
-                        <ImageView
-                            android:layout_width="30sp"
-                            android:layout_height="30sp"
-                            android:id="@+id/btnLogout"
-                            android:src="@drawable/logout_rft"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginEnd="10sp" />
-
-                        <ProgressBar
-                            android:id="@+id/progressbar_checklist_savebutton"
-                            android:layout_width="35sp"
-                            android:layout_height="35sp"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:layout_gravity="end"
-                            android:layout_marginEnd="25sp"
-                            android:indeterminate="true"
-                            android:indeterminateTint="@color/white"
-                            android:indeterminateTintMode="src_atop"
-                            android:visibility="gone" />
-
+                            android:text="" />
 
                     </RelativeLayout>
                 </androidx.appcompat.widget.Toolbar>
 
 
-                <RelativeLayout
-                    android:layout_marginTop="10sp"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_marginTop="10sp">
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:weightSum="10"
+                        android:layout_marginHorizontal="20sp"
+                        android:layout_height="wrap_content">
 
-                    <TextView
-                        style="@style/black_bold_18sp"
-                        android:id="@+id/chillerName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="35sp"
-                        android:text="Trailer Name" />
+                        <TextView
+                            android:id="@+id/chillerName"
+                            style="@style/black_bold_18sp"
+                            android:layout_width="match_parent"
+                            android:layout_weight="4"
+                            android:layout_height="wrap_content"
+                            android:text="Trailer Name" />
 
-                    <TextView
-                        android:id="@+id/chillerStatus"
-                        style="@style/black_bold_18sp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginStart="10sp"
-                        android:layout_marginEnd="25sp"
-                        android:text="Status" />
+                        <TextView
+                            android:id="@+id/chillerStatus"
+                            style="@style/black_bold_18sp"
+                            android:layout_weight="6"
+                            android:gravity="center"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Status" />
+                    </LinearLayout>
+
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvChiller"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_below="@id/chillerStatus"
                         android:layout_marginStart="10sp"
                         android:layout_marginTop="10sp"
                         android:layout_marginEnd="10sp"
                         android:layout_marginBottom="10sp" />
 
 
-                </RelativeLayout>
+                </LinearLayout>
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
 
     </RelativeLayout>
-
 
 
 </RelativeLayout>

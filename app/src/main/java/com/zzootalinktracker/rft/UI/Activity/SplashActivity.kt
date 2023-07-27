@@ -10,8 +10,6 @@ import android.os.Handler
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.util.Log
-import android.view.View
-import android.widget.RelativeLayout
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -19,17 +17,14 @@ import androidx.core.content.ContextCompat
 import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.Database.SessionManagerEmailSave
-import com.zzootalinktracker.rft.MainActivity
+import com.zzootalinktracker.rft.UI.Activity.MainActivity
 import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.Service.Adapter.DeviceNotConfiguredScreen
-import com.zzootalinktracker.rft.UI.Activity.Model.GetLasLoginDeviceHistoryModel
 import com.zzootalinktracker.rft.UI.Activity.Model.RftLoginModel
-import com.zzootalinktracker.rft.UI.Activity.NoInternetScreen
 import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -37,7 +32,6 @@ class SplashActivity : AppCompatActivity() {
 
 
     private lateinit var sessionManager: SessionManager
-    private lateinit var noInternetLayoutSplash: RelativeLayout
     private lateinit var sessionManagerEmailSave: SessionManagerEmailSave
 
 
@@ -151,7 +145,6 @@ class SplashActivity : AppCompatActivity() {
     private fun rftLogin() {
         try {
             if (isOnline(applicationContext)) {
-                noInternetLayoutSplash.visibility = View.GONE
                 try {
                     val version = Build.VERSION.SDK_INT
                     var isVersionAbove28 = 0
@@ -160,6 +153,7 @@ class SplashActivity : AppCompatActivity() {
                     } else {
                         isVersionAbove28 = 1
                     }
+                    Log.e("imei------223", sessionManager.getIMEI())
                     ApiInterface.create().rftLogin(sessionManager.getIMEI(), isVersionAbove28)
                         .enqueue(object : Callback<RftLoginModel> {
                             override fun onResponse(
@@ -176,13 +170,15 @@ class SplashActivity : AppCompatActivity() {
                                         if (rftDriver != null) {
                                             val apiHash = rftDriver.user_api_hash
                                             val deviceId = response.body()!!.data.id
-                                            val userId = response.body()!!.data.user_id
+                                            val userId = response.body()!!.data.rft_driver.id
+                                            val email = response.body()!!.data.rft_driver.email
                                             val rftDriverId =
                                                 response.body()!!.data.rft_driver.rft_driver_id
                                             sessionManager.saveApiHash(apiHash)
                                             sessionManager.saveDeviceId(deviceId)
                                             sessionManager.saveUserId(userId)
                                             sessionManager.saveRftDriverId(rftDriverId)
+                                            sessionManager.saveUserEmail(email)
                                             sessionManager.saveLoginTimeStamp(
                                                 getCurrentDateTime24Hour()
                                             )
@@ -198,7 +194,7 @@ class SplashActivity : AppCompatActivity() {
                                         // show new screen - msg => your device is not configured
                                         goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
                                     }
-                                }else{
+                                } else {
                                     goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
                                 }
 
@@ -214,19 +210,20 @@ class SplashActivity : AppCompatActivity() {
                     goToDeviceNotConfiguredScreen(NO_INTERNET)
                 }
             } else {
-
+                goToDeviceNotConfiguredScreen(NO_INTERNET)
             }
         } catch (e: Exception) {
-
+            Log.e("spash", e.message.toString())
         }
     }
 
-    private fun goToDeviceNotConfiguredScreen(type:Int) {
+    private fun goToDeviceNotConfiguredScreen(type: Int) {
         val intent = Intent(
             this@SplashActivity, DeviceNotConfiguredScreen::class.java
         )
         intent.putExtra("type", type)
         startActivity(intent)
+        finish()
     }
 
     private fun goToLoginScreen() {
@@ -242,12 +239,7 @@ class SplashActivity : AppCompatActivity() {
 
         val time = sessionManager.getLoginTimeStamp()
         if (time == "") {
-            val handler = Handler()
-            handler.postDelayed(Runnable {
-                val intent = Intent(applicationContext, MainActivity::class.java)
-                startActivity(intent)
-                finish()
-            }, 2000)
+            rftLogin()
         } else {
             val dateFormatter = getDateFormationOnly()
             if (dateFormatter.parse(time) == dateFormatter.parse(getCurrentDateOnly())) {
@@ -256,10 +248,9 @@ class SplashActivity : AppCompatActivity() {
                     val intent = Intent(applicationContext, MainActivity::class.java)
                     startActivity(intent)
                     finish()
-                }, 2000)
+                }, 1000)
             } else {
-                sessionManager.logOut()
-                getIMEI()
+                rftLogin()
             }
         }
     }

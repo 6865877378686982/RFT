@@ -5,20 +5,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".UI.Activity.MainActivity">
 
     <FrameLayout
-        android:layout_above="@id/bottomNavigation"
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="visible" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-
-        android:id="@+id/bottomNavigation"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        app:menu="@menu/bottom_navigation_menu" />
+        android:layout_marginHorizontal="70sp"
+        android:layout_marginVertical="7sp"
+        android:paddingVertical="4sp"
+        app:cardCornerRadius="5sp"
+        app:cardElevation="10sp">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigation"
+            android:layout_width="match_parent"
+            android:background="@color/red_rft"
+            android:animateLayoutChanges="false"
+            app:itemIconTint="@drawable/bottom_nav_icon_color_selector"
+            android:layout_height="wrap_content"
+            app:labelVisibilityMode="labeled"
+            style="@style/BottomNavigationView"
+            app:itemTextColor="@drawable/bottom_nav_icon_color_selector"
+            app:menu="@menu/bottom_navigation_menu" />
+    </androidx.cardview.widget.CardView>
 
 </RelativeLayout>

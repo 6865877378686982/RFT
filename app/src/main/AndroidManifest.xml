@@ -20,13 +20,6 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".UI.Activity.NoInternetScreen"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
             android:name=".Service.Adapter.DeviceNotConfiguredScreen"
             android:exported="false">
             <meta-data
@@ -34,23 +27,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".MainActivity"
-            android:exported="false"
-            android:launchMode="singleInstance">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
-            android:name=".UI.Activity.LoginActivity"
-            android:exported="false"
-            android:launchMode="singleInstance">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
-            android:name=".UI.Activity.ServerDownActivity"
+            android:name=".UI.Activity.MainActivity"
             android:exported="false"
             android:launchMode="singleInstance">
             <meta-data

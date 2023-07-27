@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="green">#53CC99</color>
     <color name="red_rft">#e51110</color>
+    <color name="red_rft_light">#EFB7B6</color>
     <color name="dark_green">#1A6A48</color>
     <color name="light_grey_transparent">#ADD1D1D1</color>
     <color name="dark_grey">#3B4147</color>
@@ -28,7 +29,11 @@
     <color name="pink">#f856a0</color>
     <color name="light_grey_rft">#D3D9E5</color>
     <color name="custom_scrollbar_color">#D1D7E1</color>
-
+    <color name="default_inactive_shape_color">#e5e5e5</color>
+    <color name="default_inactive_color">#212121</color>
+    <color name="default_shape_inactive_color">#888888</color>
+    <color name="default_badge_background_color">#f44336</color>
+    <color name="default_badge_text_color">#ffffff</color>
 
 
 </resources>

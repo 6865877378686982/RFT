@@ -26,7 +26,15 @@
     <dimen name="check_list_sub_tittle_head">14sp</dimen>
 
 
-
+    <dimen name="default_corner_radii">45sp</dimen>
+    <dimen name="default_badge_corner_radii">16sp</dimen>
+    <dimen name="default_nav_item_padding">20sp</dimen>
+    <dimen name="default_nav_item_text_size">16sp</dimen>
+    <dimen name="default_nav_item_text_padding">4sp</dimen>
+    <dimen name="default_nav_item_title_max_width">240sp</dimen>
+    <dimen name="default_icon_size">26sp</dimen>
+    <dimen name="default_nav_item_badge_padding">2sp</dimen>
+    <dimen name="default_nav_item_badge_text_size">7sp</dimen>
 
 
 </resources>

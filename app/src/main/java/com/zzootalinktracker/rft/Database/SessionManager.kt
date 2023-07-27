@@ -129,7 +129,13 @@ class SessionManager {
     public fun saveRftDriverId(count: String) {
         saveStringData(RFT_DRIVER_ID, count)
     }
-
+    public fun saveUserEmail(text: String) {
+        saveStringData("user_email", text)
+    }
+    public fun getUserEmail(): String {
+        val data = getStringData("user_email")
+        return data
+    }
     public fun getRftDriverId(): String {
         val data = getStringData(RFT_DRIVER_ID)
         return data
