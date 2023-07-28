@@ -76,6 +76,16 @@ class SessionManager {
     public fun getBooleanData(key_name: String): Boolean {
         return manager.getBoolean(key_name, false)
     }
+    fun saveTimestamp(timestamp: String) {
+        val editor = manager.edit()
+        editor.putString(TIMESTAMP_KEY, timestamp)
+        editor.apply()
+    }
+
+    fun getTimestamp(): String {
+        return manager.getString(TIMESTAMP_KEY, 0L.toString()).toString()
+    }
+
 
     public fun logOut() {
         val editor = manager.edit()

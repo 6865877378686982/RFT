@@ -1,34 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Service.Adapter.DeviceNotConfiguredScreen">
+    android:background="@color/red_rft">
 
+    <include
+        android:id="@+id/noDeviceConfiguredLayout"
+        layout="@layout/device_not_confiured"
+        android:visibility="gone" />
 
+    <include
+        android:id="@+id/noDeviceFoundLayout"
+        layout="@layout/device_not_found"
+        android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/ivNoDeviceFound"
-        android:layout_width="180sp"
-        android:layout_height="180sp"
-        android:layout_centerInParent="true"
-        android:src="@drawable/no_smartphones">
+    <include
+        android:id="@+id/noInternetFoundLayout"
+        layout="@layout/no_internet_layout"
 
+        android:visibility="gone" />
 
-    </ImageView>
+    <include
+        android:id="@+id/noServerFoundLayout"
+        layout="@layout/no_server_found"
 
-    <TextView
-        android:id="@+id/tvNoDeviceFoundMsg"
-        style="@style/black_bold_24sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/ivNoDeviceFound"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="20sp"
-        android:gravity="center"
-        android:text="Device is not configured"
-        android:textSize="24sp" />
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/noUserConfiguredLayout"
+        layout="@layout/user_not_configured"
+
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/deactivatedLayout"
+        layout="@layout/deactive_device"
+        android:visibility="gone" />
 
 
 </RelativeLayout>

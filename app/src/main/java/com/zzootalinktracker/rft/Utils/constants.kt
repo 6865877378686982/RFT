@@ -35,6 +35,9 @@ const val IMEI_ID = "IMEI_ID"
 const val NO_INTERNET = 1
 const val NO_SERVER = 2
 const val DEACTIVE_DEVICE = 3
+const val DEVICE_NOT_CONFIGURED = 4
+const val USER_NOT_CONFIGURED = 5
+const val TIMESTAMP_KEY = "time_stamp_key"
 
 
 

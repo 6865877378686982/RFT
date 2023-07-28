@@ -18,7 +18,7 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('D:\\ZZoota Projects\\RFT\\app\\rft_jks.jks')
+            storeFile file('D:\\zzoota git projects\\RFT - 28-July-2023\\RFT\\app\\rft_jks.jks')
             storePassword 'android'
             keyAlias 'key0'
             keyPassword 'android'

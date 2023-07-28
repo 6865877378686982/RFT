@@ -84,78 +84,6 @@ class LogHistoryFragment() : Fragment() {
 
         }
 
-        /*   val currentDateTime = Date()
-           val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-           val formattedDateTime = dateFormat.format(currentDateTime)
-           val dateTimeString: String = formattedDateTime
-           val data = ArrayList<TrailerModel>()
-
-
-           data.add(
-               TrailerModel(
-                   dateTimeString,
-                   "Chiller 1 & Chiller 2 are Connected",
-                   "Please retrieve Chiller Pad #1 before continuing with your leg",
-                   true
-               )
-           )
-
-           data.add(
-               TrailerModel(
-                   dateTimeString,
-                   "Chiller 1 & Chiller 2 is Disconnected",
-                   "Please retrieve Chiller Pad #1 before continuing with your leg",
-                   false
-               )
-           )
-
-           data.add(
-               TrailerModel(
-                   dateTimeString,
-                   "Chiller 1 & Chiller 2 Connected",
-                   "Please retrieve Chiller Pad #1 before continuing with your leg", true
-               )
-           )
-
-           data.add(
-               TrailerModel(
-                   dateTimeString,
-                   "Chiller 1 & Chiller 2 Connected",
-                   "Please retrieve Chiller Pad #1 before continuing with your leg", true
-               )
-           )
-
-           data.add(
-               TrailerModel(
-                   dateTimeString,
-                   "Chiller 1 & Chiller 2 Connected",
-                   "Please retrieve Chiller Pad #1 before continuing with your leg", false
-               )
-           )
-           data.add(
-               TrailerModel(
-                   dateTimeString,
-                   "Chiller 1 & Chiller 2 Connected",
-                   "Please retrieve Chiller Pad #1 before continuing with your leg", false
-               )
-           )
-           data.add(
-               TrailerModel(
-                   dateTimeString,
-                   "Chiller 1 & Chiller 2 Connected",
-                   "Please retrieve Chiller Pad #1 before continuing with your leg", true
-               )
-           )
-           data.add(
-               TrailerModel(
-                   dateTimeString,
-                   "Chiller 1 & Chiller 2 Connected",
-                   "Please retrieve Chiller Pad #1 before continuing with your leg", true
-               )
-           )*/
-/*        val adapter = TrailerAdapter(data)*/
-/*        recycler_view.adapter = adapter*/
-
 
         return viewLayout
     }
@@ -220,12 +148,12 @@ class LogHistoryFragment() : Fragment() {
                                 if (response.body()!!.status != SUCCESS_STATUS_EDGE) {
 
                                 } else {
-                                    noDataLayout.visibility = View.VISIBLE
-                                    mainLayoutLog.visibility = View.GONE
+                                   /* noDataLayout.visibility = View.VISIBLE
+                                    mainLayoutLog.visibility = View.GONE*/
                                 }
                             } else {
-                                noDataLayout.visibility = View.VISIBLE
-                                mainLayoutLog.visibility = View.GONE
+                               /* noDataLayout.visibility = View.VISIBLE
+                                mainLayoutLog.visibility = View.GONE*/
                             }
 
                         }
@@ -234,8 +162,8 @@ class LogHistoryFragment() : Fragment() {
                             call: Call<GetTagsStatusHistoryModel>,
                             t: Throwable
                         ) {
-                            noDataLayout.visibility = View.VISIBLE
-                            mainLayoutLog.visibility = View.GONE
+                          /*  noDataLayout.visibility = View.VISIBLE
+                            mainLayoutLog.visibility = View.GONE*/
                         }
 
 
@@ -247,8 +175,8 @@ class LogHistoryFragment() : Fragment() {
             } else {
               /*  val intent = Intent(context, NoInternetScreen::class.java)
                 startActivity(intent)*/
-                noInternetLayout.visibility = View.VISIBLE
-                mainLayoutLog.visibility = View.GONE
+             /*   noInternetLayout.visibility = View.VISIBLE
+                mainLayoutLog.visibility = View.GONE*/
             }
 
         } catch (e: Exception) {

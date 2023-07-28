@@ -188,14 +188,14 @@ class SplashActivity : AppCompatActivity() {
                                             startActivity(intent)
                                         } else {
                                             // show new screen - msg => your device is not configured
-                                            goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
+                                            goToDeviceNotConfiguredScreen(USER_NOT_CONFIGURED)
                                         }
                                     } else {
                                         // show new screen - msg => your device is not configured
-                                        goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
+                                        goToDeviceNotConfiguredScreen(DEVICE_NOT_CONFIGURED)
                                     }
                                 } else {
-                                    goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
+                                    goToDeviceNotConfiguredScreen(NO_SERVER)
                                 }
 
                             }
@@ -207,7 +207,7 @@ class SplashActivity : AppCompatActivity() {
 
                         })
                 } catch (e: Exception) {
-                    goToDeviceNotConfiguredScreen(NO_INTERNET)
+                    Log.e("hi", e.toString())
                 }
             } else {
                 goToDeviceNotConfiguredScreen(NO_INTERNET)

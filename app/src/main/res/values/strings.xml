@@ -6,7 +6,9 @@
     <string name="retry">Retry</string>
     <string name="deactive_device">Your Device is Deactivated From Link,\n Please Ask your manager to Active this device.</string>
     <string name="device_not_confgured">Your Device is IMEI/Android Id not configured in Link.</string>
-    <string name="server_stopped">An Error Occured While Loading \n Please try again!</string>
-    <string name="user_not_configured">User has not been configured with this device, Please ask you manager to configue it and then restart!</string>
+    <string name="server_stopped">An Error Occurred While Loading \n Please try again!</string>
+    <string name="user_not_configured">User has not been configured with this device, Please ask you manager to configure it and then restart!</string>
+    <string name="no_internet">Cannot Connect to a Local Network \n You must connect to a Wi-Fi network!</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

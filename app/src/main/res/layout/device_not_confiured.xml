@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/red_rft"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/ivNoWifi"
+        android:layout_width="250sp"
+        android:layout_height="250sp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/no_device_found" />
+
+    <TextView
+        style="@style/black_bold_24sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ivNoWifi"
+        android:layout_marginTop="30sp"
+        android:gravity="center"
+        android:text="Device Not Configured!"
+        android:textColor="@color/white">
+
+
+    </TextView>
+
+</RelativeLayout>

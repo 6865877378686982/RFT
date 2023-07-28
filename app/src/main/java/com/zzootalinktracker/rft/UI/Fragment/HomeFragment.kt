@@ -30,6 +30,7 @@ import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.Service.GetTrailerTagStatusService
 import com.zzootalinktracker.rft.Service.Adapter.ChillerAdapter
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
+import com.zzootalinktracker.rft.Utils.getCurrentDateTime24Hour
 import com.zzootalinktracker.rft.Utils.isOnline
 import kotlin.collections.ArrayList
 
@@ -45,6 +46,7 @@ class HomeFragment() : Fragment(), View.OnClickListener {
     private lateinit var adapter: ChillerAdapter
     private lateinit var progressBar: ProgressBar
     private lateinit var viewLayout: View
+    private lateinit var tvLastRefreshed: TextView
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -68,9 +70,11 @@ class HomeFragment() : Fragment(), View.OnClickListener {
             progressBar = viewLayout.findViewById(R.id.progressBar)
             progressBar.visibility = View.GONE
             tvDriverName = viewLayout.findViewById(R.id.tvDriverName)
+            tvLastRefreshed = viewLayout.findViewById(R.id.tvLastRefreshed)
 
             tvDriverName.text = "Hi, " + sessionManager.getUserEmail()
             rvChiller.layoutManager = LinearLayoutManager(context!!)
+
 
             setAdapter()
         } catch (e: Exception) {
@@ -94,6 +98,11 @@ class HomeFragment() : Fragment(), View.OnClickListener {
         @SuppressLint("NotifyDataSetChanged")
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == "TRAILER_STATUS_UPDATE") {
+                val currentTimestamp = System.currentTimeMillis()
+                sessionManager.saveTimestamp(getCurrentDateTime24Hour())
+                val lastRefreshTime = sessionManager.getLoginTimeStamp()
+                tvLastRefreshed.text = "Last Refreshed at: "+lastRefreshTime
+                Log.e("timestamp","jghjgjg")
                 val intentData = intent.getStringExtra("trailerList")
                 val gson = Gson()
                 val model = gson.fromJson(intentData, GetTrailerTagsStatusModel::class.java)
