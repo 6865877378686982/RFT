@@ -15,7 +15,7 @@
 
     <!--Main Tittle Size-->
     <dimen name="tittle_size_list">18sp</dimen>
-    <dimen name="tittle_size_list1">24sp</dimen>
+    <dimen name="tittle_size_list1">20sp</dimen>
     <dimen name="check_list_sub_tittle">16sp</dimen>
     <dimen name="task_detail_size">22sp</dimen>
     <dimen name="task_detail_table_text">14sp</dimen>

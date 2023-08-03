@@ -37,6 +37,10 @@ const val NO_SERVER = 2
 const val DEACTIVE_DEVICE = 3
 const val DEVICE_NOT_CONFIGURED = 4
 const val USER_NOT_CONFIGURED = 5
+const val NO_DATA_FOUND = 6
+const val PROGRESS_BAR = 7
+const val ADAPTER_LAYOUT = 8
+
 const val TIMESTAMP_KEY = "time_stamp_key"
 
 

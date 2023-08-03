@@ -19,7 +19,7 @@ import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.Database.SessionManagerEmailSave
 import com.zzootalinktracker.rft.UI.Activity.MainActivity
 import com.zzootalinktracker.rft.R
-import com.zzootalinktracker.rft.Service.Adapter.DeviceNotConfiguredScreen
+import com.zzootalinktracker.rft.UI.Fragment.Adapter.DeviceNotConfiguredScreen
 import com.zzootalinktracker.rft.UI.Activity.Model.RftLoginModel
 import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call

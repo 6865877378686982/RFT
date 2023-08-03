@@ -22,7 +22,7 @@ class GetTrailerTagStatusService : Service() {
     lateinit var sessionManager: SessionManager
     var handler: Handler? = null
     var runnable: Runnable? = null
-    val REQUEST_TIME = 15000 as Long
+    val REQUEST_TIME = 30000.toLong()
     override fun onBind(intent: Intent?): IBinder? {
 
         return null
@@ -49,11 +49,6 @@ class GetTrailerTagStatusService : Service() {
                                         if (response.isSuccessful) {
                                             val responseBody = response.body()
                                             if (responseBody != null && responseBody.status == SUCCESS_STATUS_EDGE) {
-
-                                                var trailerList = responseBody.data
-                                                for (data in trailerList) {
-
-                                                }
                                                 val jsonString = Gson().toJson(responseBody)
                                                 val intent = Intent("TRAILER_STATUS_UPDATE")
                                                 intent.putExtra(
@@ -96,13 +91,9 @@ class GetTrailerTagStatusService : Service() {
             }
         }
 
-        handler!!.postDelayed(runnable!!, REQUEST_TIME)
+        handler!!.postDelayed(runnable!!, 100)
 
         return START_NOT_STICKY
     }
 
-
-    private fun getTrailerTagsStatus() {
-
-    }
 }

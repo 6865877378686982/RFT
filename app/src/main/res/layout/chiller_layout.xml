@@ -89,7 +89,7 @@
                                 android:text="Tag #1" />
 
                             <TextView
-                                style="@style/black_bold_18sp"
+                                style="@style/black_bold_16sp"
                                 android:id="@+id/tvtag1Status"
                                 android:layout_alignParentEnd="true"
                                 android:layout_width="wrap_content"
@@ -126,7 +126,7 @@
                                 android:text="Tag #2" />
 
                             <TextView
-                                style="@style/black_bold_18sp"
+                                style="@style/black_bold_16sp"
                                 android:id="@+id/tvtag2Status"
                                 android:layout_alignParentEnd="true"
                                 android:layout_width="wrap_content"

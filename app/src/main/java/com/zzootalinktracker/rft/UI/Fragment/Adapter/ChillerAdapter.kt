@@ -1,19 +1,14 @@
-package com.zzootalinktracker.rft.Service.Adapter
+package com.zzootalinktracker.rft.UI.Fragment.Adapter
 
-import android.animation.ObjectAnimator
 import android.content.Context
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
-
 import de.hdodenhof.circleimageview.CircleImageView
 
 class ChillerAdapter(
@@ -28,13 +23,9 @@ class ChillerAdapter(
         private val tvtag1Status: TextView = itemView.findViewById(R.id.tvtag1Status)
         private val tvtag2: TextView = itemView.findViewById(R.id.tvtag2)
         private val tvtag2Status: TextView = itemView.findViewById(R.id.tvtag2Status)
-        private val dropdownChecklist: ImageView = itemView.findViewById(R.id.dropdown_checklist)
-        private val tagLayout: LinearLayout = itemView.findViewById(R.id.tagLayout)
         private val ivChillerPadStatus: CircleImageView =
             itemView.findViewById(R.id.ivChillerPadStatus)
-        private var rotationAngle = 0f
 
-        /*  lateinit var adapter: PadAdapter*/
         fun bind(item: GetTrailerTagsStatusModel.Data) {
             tvTrailerName.text = item.trailerName
             tvtag1.text = item.tag1Name
@@ -42,15 +33,19 @@ class ChillerAdapter(
             val tag1 = item.tag1
             if (tag1) {
                 tvtag1Status.text = "Connected"
+                tvtag1Status.setTextColor(ContextCompat.getColor(context, R.color.green))
             } else {
                 tvtag1Status.text = "Not Connected"
+                tvtag1Status.setTextColor(ContextCompat.getColor(context, R.color.red_rft))
             }
 
             val tag2 = item.tag2
             if (tag2) {
                 tvtag2Status.text = "Connected"
+                tvtag2Status.setTextColor(ContextCompat.getColor(context, R.color.green))
             } else {
                 tvtag2Status.text = "Not Connected"
+                tvtag2Status.setTextColor(ContextCompat.getColor(context, R.color.red_rft))
             }
 
             if (tag1 && tag2) {
@@ -60,52 +55,7 @@ class ChillerAdapter(
             }
 
 
-            /*tagLayout.visibility = View.GONE*/
-            /*rvPads.layoutManager = LinearLayoutManager(context)
-            adapter = PadAdapter(context!!, mlist)
-            rvPads.adapter = adapter*/
-
-
-
-          /*  dropdownChecklist.setOnClickListener {
-                openClosedRV()
-            }
-            itemView.setOnClickListener {
-                openClosedRV()
-            }*/
-
-
         }
-
-        private fun openClosedRV() {
-            try {
-                val anim = ObjectAnimator.ofFloat(
-                    dropdownChecklist,
-                    "rotation",
-                    rotationAngle,
-                    rotationAngle + 180
-                )
-                anim.duration = 200
-                anim.start()
-                rotationAngle += 180f
-                rotationAngle %= 360
-
-
-                //dropdown_checklist.setColorFilter(com.sygic.example.hello3dwiw.R.color.emoji_color)
-                if (tagLayout.visibility == View.VISIBLE) {
-                    tagLayout.visibility = View.GONE
-
-
-                } else {
-
-                    tagLayout.visibility = View.VISIBLE
-                }
-            } catch (e: java.lang.Exception) {
-
-            }
-
-        }
-
     }
 
 

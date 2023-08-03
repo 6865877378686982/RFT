@@ -1,52 +1,52 @@
 package com.zzootalinktracker.rft.UI.Fragment
 
 import android.annotation.SuppressLint
-import android.app.ActivityManager
+import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.RelativeLayout
+import android.view.Window
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat.*
+import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.zzootalinktracker.rft.Database.SessionManager
-import com.zzootalinktracker.rft.Database.SessionManagerEmailSave
 import com.zzootalinktracker.rft.R
-import com.zzootalinktracker.rft.Service.GetTrailerTagStatusService
-import com.zzootalinktracker.rft.Service.Adapter.ChillerAdapter
+import com.zzootalinktracker.rft.UI.Fragment.Adapter.ChillerAdapter
+import com.zzootalinktracker.rft.UI.Fragment.Adapter.StoredAlertAdapter
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
+import com.zzootalinktracker.rft.UI.Fragment.Model.TagModel
+import com.zzootalinktracker.rft.Utils.SUCCESS_STATUS_EDGE
 import com.zzootalinktracker.rft.Utils.getCurrentDateTime24Hour
-import com.zzootalinktracker.rft.Utils.isOnline
-import kotlin.collections.ArrayList
 
 
 class HomeFragment() : Fragment(), View.OnClickListener {
 
 
     private lateinit var rvChiller: RecyclerView
+    private lateinit var scrollView: NestedScrollView
     private lateinit var tvDriverName: TextView
-    private lateinit var mainLayoutHomeFragment: RelativeLayout
     private lateinit var sessionManager: SessionManager
     private lateinit var trailerList: ArrayList<GetTrailerTagsStatusModel.Data>
     private lateinit var adapter: ChillerAdapter
-    private lateinit var progressBar: ProgressBar
+    private lateinit var storedAlertAdapter: StoredAlertAdapter
+    private lateinit var progressBar: LinearLayout
     private lateinit var viewLayout: View
     private lateinit var tvLastRefreshed: TextView
+    private lateinit var tagModelArray: ArrayList<TagModel>
+    private lateinit var stoedAlertDialog: Dialog
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -66,20 +66,30 @@ class HomeFragment() : Fragment(), View.OnClickListener {
         try {
             sessionManager = SessionManager(context!!)
             rvChiller = viewLayout.findViewById(R.id.rvChiller)
-            mainLayoutHomeFragment = viewLayout.findViewById(R.id.mainLayoutHomeFragment)
+            scrollView = viewLayout.findViewById(R.id.scrollView)
             progressBar = viewLayout.findViewById(R.id.progressBar)
-            progressBar.visibility = View.GONE
+
             tvDriverName = viewLayout.findViewById(R.id.tvDriverName)
             tvLastRefreshed = viewLayout.findViewById(R.id.tvLastRefreshed)
 
             tvDriverName.text = "Hi, " + sessionManager.getUserEmail()
             rvChiller.layoutManager = LinearLayoutManager(context!!)
-
-
+            showHideProgressBar(true)
             setAdapter()
         } catch (e: Exception) {
             Log.e("HomeFragment", e.message.toString())
         }
+    }
+
+    private fun showHideProgressBar(yes: Boolean) {
+        if (yes) {
+            progressBar.visibility = View.VISIBLE
+            scrollView.visibility = View.GONE
+        } else {
+            progressBar.visibility = View.GONE
+            scrollView.visibility = View.VISIBLE
+        }
+
     }
 
     private fun setAdapter() {
@@ -87,7 +97,6 @@ class HomeFragment() : Fragment(), View.OnClickListener {
             trailerList = ArrayList()
             adapter = ChillerAdapter(context!!, trailerList)
             rvChiller.adapter = adapter
-            changeProgressColor()
         } catch (e: Exception) {
             Log.e("HomeFragment", e.message.toString())
         }
@@ -98,31 +107,84 @@ class HomeFragment() : Fragment(), View.OnClickListener {
         @SuppressLint("NotifyDataSetChanged")
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == "TRAILER_STATUS_UPDATE") {
-                val currentTimestamp = System.currentTimeMillis()
                 sessionManager.saveTimestamp(getCurrentDateTime24Hour())
                 val lastRefreshTime = sessionManager.getTimestamp()
-                tvLastRefreshed.text = "Last Refreshed at: "+lastRefreshTime
-                Log.e("timestamp","jghjgjg")
+                tvLastRefreshed.text = "Last Refreshed at: $lastRefreshTime"
                 val intentData = intent.getStringExtra("trailerList")
                 val gson = Gson()
                 val model = gson.fromJson(intentData, GetTrailerTagsStatusModel::class.java)
-                trailerList.clear()
-                trailerList.addAll(model.data)
-                progressBar.visibility = View.GONE
-                adapter.notifyDataSetChanged()
+                if (model.status == SUCCESS_STATUS_EDGE) {
+                    if (model.data.size > 0) {
+                        tagModelArray = ArrayList()
+
+                        model.data.forEach {
+                            if (!it.tag1) {
+                                tagModelArray.add(TagModel("1", false, it.tag1Name))
+                            }
+                            if (!it.tag2) {
+                                tagModelArray.add(TagModel("1", false, it.tag2Name))
+                            }
+                        }
+                        /*Got Those Tag which are disconnected*/
+                        showStoredAlert()
+
+
+                        trailerList.clear()
+                        trailerList.addAll(model.data)
+                        showHideProgressBar(false)
+                        adapter.notifyDataSetChanged()
+                    } else {
+                        showHideProgressBar(false)
+                        /*Need to show no data found layout*/
+                    }
+                } else {
+                    /*Need to show no data found layout*/
+                    showHideProgressBar(false)
+                }
+
+
             }
         }
     }
 
-    private fun changeProgressColor() {
-        val progressColor = resources.getColor(R.color.red_rft)
-        val colorFilter = PorterDuffColorFilter(progressColor, PorterDuff.Mode.SRC_IN)
-        progressBar.indeterminateDrawable.colorFilter = colorFilter
+    private fun showStoredAlert() {
+        try {
+            if (requireActivity().isFinishing) {
+                return
+            }
+            try {
+                if (stoedAlertDialog != null) {
+                    stoedAlertDialog.dismiss()
+                }
+            } catch (e: java.lang.Exception) {
+
+            }
+
+            stoedAlertDialog = Dialog(requireActivity())
+            stoedAlertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            stoedAlertDialog.setCancelable(true)
+            stoedAlertDialog.setContentView(R.layout.stored_alert_layout)
+            stoedAlertDialog.show()
+            stoedAlertDialog.window!!.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            val saveStoredAlert = stoedAlertDialog.findViewById(R.id.saveStoredAlert) as Button
+            val rvAlertaLayout = stoedAlertDialog.findViewById(R.id.rvAlertaLayout) as RecyclerView
+            rvAlertaLayout.layoutManager = LinearLayoutManager(context!!)
+            storedAlertAdapter = StoredAlertAdapter(context!!, tagModelArray)
+
+            rvAlertaLayout.adapter = storedAlertAdapter
+            saveStoredAlert.setOnClickListener {
+                stoedAlertDialog.dismiss()
+            }
+        } catch (e: Exception) {
+
+        }
     }
+
 
     override fun onResume() {
         super.onResume()
-        progressBar.visibility = View.VISIBLE
     }
 
 

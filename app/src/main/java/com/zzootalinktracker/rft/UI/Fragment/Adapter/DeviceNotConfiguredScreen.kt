@@ -1,4 +1,4 @@
-package com.zzootalinktracker.rft.Service.Adapter
+package com.zzootalinktracker.rft.UI.Fragment.Adapter
 
 import android.annotation.SuppressLint
 import android.content.Intent

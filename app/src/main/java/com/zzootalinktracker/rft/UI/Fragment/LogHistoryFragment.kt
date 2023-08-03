@@ -1,12 +1,16 @@
 package com.zzootalinktracker.rft.UI.Fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.RelativeLayout
+import android.widget.Spinner
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -29,17 +33,15 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var recycler_view: RecyclerView
     private lateinit var sessionManager: SessionManager
     private lateinit var spinner: Spinner
-    private lateinit var text_view: TextView
     private lateinit var noInternetLayout: RelativeLayout
-    private lateinit var progressBarLog: ProgressBar
+    private lateinit var progressBarLayout: RelativeLayout
     private lateinit var noDataLayout: RelativeLayout
     private lateinit var mainLayoutLog: RelativeLayout
+    private lateinit var noServerFound: RelativeLayout
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     val dropdownFilterList = arrayOf(
         "Today", "7 Days", "30 Days", "Custom"
     )
-
-    /* private lateinit var customScrollbar: ImageView*/
     private lateinit var viewLayout: View
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,18 +49,23 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     ): View? {
 
         viewLayout = inflater.inflate(R.layout.fragment_log_history, container, false)
+        initView()
+
+
+        return viewLayout
+    }
+
+    @SuppressLint("UseRequireInsteadOfGet")
+    private fun initView() {
         recycler_view = viewLayout.findViewById(R.id.recycler_view)
         spinner = viewLayout.findViewById(R.id.spinner)
-        text_view = viewLayout.findViewById(R.id.text_view)
         swipeRefreshLayout = viewLayout.findViewById(R.id.swipeRefreshLayout)
-        swipeRefreshLayout.setOnRefreshListener {
-
-        }
+        swipeRefreshLayout.setOnRefreshListener(this)
         noInternetLayout = viewLayout.findViewById(R.id.noInternetLayout)
         noDataLayout = viewLayout.findViewById(R.id.noDataLayout)
+        noServerFound = viewLayout.findViewById(R.id.noServerFound)
         mainLayoutLog = viewLayout.findViewById(R.id.mainLayoutLog)
-        progressBarLog = viewLayout.findViewById(R.id.progressBarLog)
-        progressBarLog.visibility = View.GONE
+        progressBarLayout = viewLayout.findViewById(R.id.progressBarLayout)
         sessionManager = SessionManager(context!!)
         recycler_view.layoutManager = LinearLayoutManager(context!!)
         val adapter =
@@ -95,13 +102,51 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         }
 
+        getTagsStatusHistory(getCurrentDateForEdge(), getCurrentDateForEdge())
+    }
 
-        return viewLayout
+    private fun updateUI(mode: Int) {
+        when (mode) {
+            NO_INTERNET -> {
+                noInternetLayout.visibility = View.VISIBLE
+                progressBarLayout.visibility = View.GONE
+                mainLayoutLog.visibility = View.GONE
+                noServerFound.visibility = View.GONE
+                noDataLayout.visibility = View.GONE
+            }
+            NO_SERVER -> {
+                noInternetLayout.visibility = View.GONE
+                progressBarLayout.visibility = View.GONE
+                mainLayoutLog.visibility = View.GONE
+                noServerFound.visibility = View.VISIBLE
+                noDataLayout.visibility = View.GONE
+            }
+            NO_DATA_FOUND -> {
+                noInternetLayout.visibility = View.GONE
+                progressBarLayout.visibility = View.GONE
+                mainLayoutLog.visibility = View.GONE
+                noServerFound.visibility = View.GONE
+                noDataLayout.visibility = View.VISIBLE
+            }
+            PROGRESS_BAR -> {
+                noInternetLayout.visibility = View.GONE
+                progressBarLayout.visibility = View.VISIBLE
+                mainLayoutLog.visibility = View.GONE
+                noServerFound.visibility = View.GONE
+                noDataLayout.visibility = View.GONE
+            }
+            ADAPTER_LAYOUT -> {
+                noInternetLayout.visibility = View.GONE
+                progressBarLayout.visibility = View.GONE
+                mainLayoutLog.visibility = View.VISIBLE
+                noServerFound.visibility = View.GONE
+                noDataLayout.visibility = View.GONE
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        spinner.setSelection(0)
     }
 
     private fun setupRangePickerDialog() {
@@ -148,9 +193,8 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun getTagsStatusHistory(startDate: String, endDate: String) {
-        try {
             if (isOnline(context!!)) {
-
+                updateUI(PROGRESS_BAR)
                 try {
                     ApiInterface.createForRFT().getTagsStatusHistory(
                         "\$2y\$10$" + "UxX6IwSI56UNrQGDNDOL/e2MM6fUVUU9LTx.8lnIQEDGFdRt.ZfUu",
@@ -161,22 +205,19 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                             response: Response<GetTagsStatusHistoryModel>
                         ) {
                             if (response.isSuccessful) {
-                                progressBarLog.visibility = View.GONE
-                                if (response.body()!!.status != SUCCESS_STATUS_EDGE) {
-                                    if (response.body()!!.data != null) {
 
+                                if (response.body()!!.status == SUCCESS_STATUS_EDGE) {
+                                    if (response.body()!!.data != null) {
+                                        updateUI(ADAPTER_LAYOUT)
                                     } else {
-                                        progressBarLog.visibility = View.VISIBLE
+                                        updateUI(NO_DATA_FOUND)
                                     }
 
                                 } else {
-                                    /* noDataLayout.visibility = View.VISIBLE
-                                     mainLayoutLog.visibility = View.GONE*/
+                                    updateUI(NO_DATA_FOUND)
                                 }
                             } else {
-                                /* noDataLayout.visibility = View.VISIBLE
-                                 mainLayoutLog.visibility = View.GONE*/
-                                progressBarLog.visibility = View.VISIBLE
+                                updateUI(NO_SERVER)
                             }
 
                         }
@@ -185,8 +226,7 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                             call: Call<GetTagsStatusHistoryModel>,
                             t: Throwable
                         ) {
-                            /*  noDataLayout.visibility = View.VISIBLE
-                              mainLayoutLog.visibility = View.GONE*/
+                            updateUI(NO_SERVER)
                         }
 
 
@@ -196,22 +236,13 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
                 }
             } else {
-                /*  val intent = Intent(context, NoInternetScreen::class.java)
-                  startActivity(intent)*/
-                /*   noInternetLayout.visibility = View.VISIBLE
-                   mainLayoutLog.visibility = View.GONE*/
+                updateUI(NO_INTERNET)
             }
-
-        } catch (e: Exception) {
-
-        }
-
-
     }
 
     override fun onRefresh() {
-        text_view.text = "EHello"
-        swipeRefreshLayout.isRefreshing = true
+        swipeRefreshLayout.isRefreshing = false
+        getTagsStatusHistory(getCurrentDateForEdge(), getCurrentDateForEdge())
     }
 
 }
