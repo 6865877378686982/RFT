@@ -1,6 +1,7 @@
 package com.zzootalinktracker.rft.UI.Fragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -19,17 +21,20 @@ import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
 import java.util.*
 
 
-class LogHistoryFragment() : Fragment() {
+class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var recycler_view: RecyclerView
     private lateinit var sessionManager: SessionManager
     private lateinit var spinner: Spinner
+    private lateinit var text_view: TextView
     private lateinit var noInternetLayout: RelativeLayout
     private lateinit var progressBarLog: ProgressBar
     private lateinit var noDataLayout: RelativeLayout
     private lateinit var mainLayoutLog: RelativeLayout
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     val dropdownFilterList = arrayOf(
         "Today", "7 Days", "30 Days", "Custom"
     )
@@ -44,10 +49,16 @@ class LogHistoryFragment() : Fragment() {
         viewLayout = inflater.inflate(R.layout.fragment_log_history, container, false)
         recycler_view = viewLayout.findViewById(R.id.recycler_view)
         spinner = viewLayout.findViewById(R.id.spinner)
+        text_view = viewLayout.findViewById(R.id.text_view)
+        swipeRefreshLayout = viewLayout.findViewById(R.id.swipeRefreshLayout)
+        swipeRefreshLayout.setOnRefreshListener {
+
+        }
         noInternetLayout = viewLayout.findViewById(R.id.noInternetLayout)
         noDataLayout = viewLayout.findViewById(R.id.noDataLayout)
         mainLayoutLog = viewLayout.findViewById(R.id.mainLayoutLog)
         progressBarLog = viewLayout.findViewById(R.id.progressBarLog)
+        progressBarLog.visibility = View.GONE
         sessionManager = SessionManager(context!!)
         recycler_view.layoutManager = LinearLayoutManager(context!!)
         val adapter =
@@ -121,20 +132,25 @@ class LogHistoryFragment() : Fragment() {
             val selection = it as androidx.core.util.Pair<*, *>
             val startDate = selection.first as Long
             val endDate = selection.second as Long
-            val first: String = getCurrentDateForEdge().format(Date(startDate))
-            val second: String = getCurrentDateForEdge().format(Date(endDate))
-            getTagsStatusHistory(first, second)
+            val startDateString = convertMillisToDate(startDate)
+            val endDateString = convertMillisToDate(endDate)
+            getTagsStatusHistory(startDateString, endDateString)
+            Log.e("Date123", "Date123")
 
         }
 
 
     }
 
+    private fun convertMillisToDate(millis: Long): String {
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        return sdf.format(Date(millis))
+    }
+
     private fun getTagsStatusHistory(startDate: String, endDate: String) {
         try {
             if (isOnline(context!!)) {
-                noInternetLayout.visibility = View.GONE
-                mainLayoutLog.visibility = View.VISIBLE
+
                 try {
                     ApiInterface.createForRFT().getTagsStatusHistory(
                         "\$2y\$10$" + "UxX6IwSI56UNrQGDNDOL/e2MM6fUVUU9LTx.8lnIQEDGFdRt.ZfUu",
@@ -145,15 +161,22 @@ class LogHistoryFragment() : Fragment() {
                             response: Response<GetTagsStatusHistoryModel>
                         ) {
                             if (response.isSuccessful) {
+                                progressBarLog.visibility = View.GONE
                                 if (response.body()!!.status != SUCCESS_STATUS_EDGE) {
+                                    if (response.body()!!.data != null) {
+
+                                    } else {
+                                        progressBarLog.visibility = View.VISIBLE
+                                    }
 
                                 } else {
-                                   /* noDataLayout.visibility = View.VISIBLE
-                                    mainLayoutLog.visibility = View.GONE*/
+                                    /* noDataLayout.visibility = View.VISIBLE
+                                     mainLayoutLog.visibility = View.GONE*/
                                 }
                             } else {
-                               /* noDataLayout.visibility = View.VISIBLE
-                                mainLayoutLog.visibility = View.GONE*/
+                                /* noDataLayout.visibility = View.VISIBLE
+                                 mainLayoutLog.visibility = View.GONE*/
+                                progressBarLog.visibility = View.VISIBLE
                             }
 
                         }
@@ -162,8 +185,8 @@ class LogHistoryFragment() : Fragment() {
                             call: Call<GetTagsStatusHistoryModel>,
                             t: Throwable
                         ) {
-                          /*  noDataLayout.visibility = View.VISIBLE
-                            mainLayoutLog.visibility = View.GONE*/
+                            /*  noDataLayout.visibility = View.VISIBLE
+                              mainLayoutLog.visibility = View.GONE*/
                         }
 
 
@@ -173,10 +196,10 @@ class LogHistoryFragment() : Fragment() {
 
                 }
             } else {
-              /*  val intent = Intent(context, NoInternetScreen::class.java)
-                startActivity(intent)*/
-             /*   noInternetLayout.visibility = View.VISIBLE
-                mainLayoutLog.visibility = View.GONE*/
+                /*  val intent = Intent(context, NoInternetScreen::class.java)
+                  startActivity(intent)*/
+                /*   noInternetLayout.visibility = View.VISIBLE
+                   mainLayoutLog.visibility = View.GONE*/
             }
 
         } catch (e: Exception) {
@@ -184,6 +207,11 @@ class LogHistoryFragment() : Fragment() {
         }
 
 
+    }
+
+    override fun onRefresh() {
+        text_view.text = "EHello"
+        swipeRefreshLayout.isRefreshing = true
     }
 
 }

@@ -62,7 +62,7 @@ class GetTrailerTagStatusService : Service() {
                                                 )
                                                 LocalBroadcastManager.getInstance(applicationContext)
                                                     .sendBroadcast(intent)
-                                                Log.e("Service","Service")
+                                                Log.e("Service123","Service")
                                                 handler!!.postDelayed(runnable!!, REQUEST_TIME)
 
                                             } else {

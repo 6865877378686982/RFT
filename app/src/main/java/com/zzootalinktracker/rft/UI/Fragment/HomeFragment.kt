@@ -100,7 +100,7 @@ class HomeFragment() : Fragment(), View.OnClickListener {
             if (intent.action == "TRAILER_STATUS_UPDATE") {
                 val currentTimestamp = System.currentTimeMillis()
                 sessionManager.saveTimestamp(getCurrentDateTime24Hour())
-                val lastRefreshTime = sessionManager.getLoginTimeStamp()
+                val lastRefreshTime = sessionManager.getTimestamp()
                 tvLastRefreshed.text = "Last Refreshed at: "+lastRefreshTime
                 Log.e("timestamp","jghjgjg")
                 val intentData = intent.getStringExtra("trailerList")
