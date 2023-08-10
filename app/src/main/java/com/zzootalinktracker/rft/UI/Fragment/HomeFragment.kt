@@ -6,15 +6,17 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.telephony.SmsManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.*
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
@@ -22,17 +24,28 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
+import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.R
+import com.zzootalinktracker.rft.UI.Activity.Model.AddSpace10XBTDataModel
+import com.zzootalinktracker.rft.UI.Activity.Model.TrailerTagModel
 import com.zzootalinktracker.rft.UI.Fragment.Adapter.ChillerAdapter
 import com.zzootalinktracker.rft.UI.Fragment.Adapter.StoredAlertAdapter
+import com.zzootalinktracker.rft.UI.Fragment.Adapter.StoredMissingTagsAdapter
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
-import com.zzootalinktracker.rft.UI.Fragment.Model.TagModel
 import com.zzootalinktracker.rft.Utils.SUCCESS_STATUS_EDGE
 import com.zzootalinktracker.rft.Utils.getCurrentDateTime24Hour
+import com.zzootalinktracker.rft.Utils.isOnline
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
-class HomeFragment() : Fragment(), View.OnClickListener {
+class HomeFragment() : Fragment(), View.OnClickListener,
+    StoredMissingTagsAdapter.OnRadioButtonClickListener {
 
 
     private lateinit var rvChiller: RecyclerView
@@ -45,8 +58,14 @@ class HomeFragment() : Fragment(), View.OnClickListener {
     private lateinit var progressBar: LinearLayout
     private lateinit var viewLayout: View
     private lateinit var tvLastRefreshed: TextView
-    private lateinit var tagModelArray: ArrayList<TagModel>
+    private lateinit var tagModelArray: ArrayList<TrailerTagModel>
     private lateinit var stoedAlertDialog: Dialog
+    private var isStoredOrMissing = ""
+    private var tagModelArrayStatus = ""
+    private var macAddress = ""
+    private lateinit var hexTimeStamp: String
+    private val PERMISSION_SEND_SMS = 123
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -68,13 +87,12 @@ class HomeFragment() : Fragment(), View.OnClickListener {
             rvChiller = viewLayout.findViewById(R.id.rvChiller)
             scrollView = viewLayout.findViewById(R.id.scrollView)
             progressBar = viewLayout.findViewById(R.id.progressBar)
-
             tvDriverName = viewLayout.findViewById(R.id.tvDriverName)
             tvLastRefreshed = viewLayout.findViewById(R.id.tvLastRefreshed)
-
             tvDriverName.text = "Hi, " + sessionManager.getUserEmail()
             rvChiller.layoutManager = LinearLayoutManager(context!!)
             showHideProgressBar(true)
+            tagModelArray = ArrayList()
             setAdapter()
         } catch (e: Exception) {
             Log.e("HomeFragment", e.message.toString())
@@ -115,19 +133,49 @@ class HomeFragment() : Fragment(), View.OnClickListener {
                 val model = gson.fromJson(intentData, GetTrailerTagsStatusModel::class.java)
                 if (model.status == SUCCESS_STATUS_EDGE) {
                     if (model.data.size > 0) {
-                        tagModelArray = ArrayList()
+                        if (tagModelArray.size == 0) {
+                            model.data.forEach {
 
-                        model.data.forEach {
-                            if (!it.tag1) {
-                                tagModelArray.add(TagModel("1", false, it.tag1Name))
-                            }
-                            if (!it.tag2) {
-                                tagModelArray.add(TagModel("1", false, it.tag2Name))
+                                var list = ArrayList<TrailerTagModel.Tags>()
+                                if (!it.tag1) {
+                                    list.add(
+                                        TrailerTagModel.Tags(
+                                            "1",
+                                            null,
+                                            it.tag1Name, it.tag1Imei
+                                        )
+                                    )
+                                }
+                                if (!it.tag2) {
+                                    list.add(
+                                        TrailerTagModel.Tags(
+                                            "1",
+                                            null,
+                                            it.tag2Name, it.tag2Imei
+                                        )
+                                    )
+                                }
+                                if (list.size > 0) {
+                                    if (it.imei == "2302210003E9") {
+                                        val model =
+                                            TrailerTagModel(
+                                                it.trailerId,
+                                                it.trailerName,
+                                                it.imei,
+                                                list
+                                            )
+                                        tagModelArray.add(model)
+                                    }
+
+                                }
+                                macAddress = it.imei
+                             if (it.tag2IsMissingOrStored == "MISSING"){
+                                 sendSMS()
+                             }
                             }
                         }
                         /*Got Those Tag which are disconnected*/
                         showStoredAlert()
-
 
                         trailerList.clear()
                         trailerList.addAll(model.data)
@@ -147,6 +195,24 @@ class HomeFragment() : Fragment(), View.OnClickListener {
         }
     }
 
+    @SuppressLint("SuspiciousIndentation")
+    private fun sendSMS() {
+        val phoneNumber = "8360082296"
+        val message = "Hello, Your tag is missing"
+
+            try {
+                val smsManager = SmsManager.getDefault()
+                smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+                Toast.makeText(context!!, "SMS sent successfully", Toast.LENGTH_SHORT).show()
+            } catch (ex: Exception) {
+                Toast.makeText(context!!, "SMS sending failed", Toast.LENGTH_SHORT).show()
+                ex.printStackTrace()
+            }
+
+    }
+
+
+
     private fun showStoredAlert() {
         try {
             if (requireActivity().isFinishing) {
@@ -155,6 +221,7 @@ class HomeFragment() : Fragment(), View.OnClickListener {
             try {
                 if (stoedAlertDialog != null) {
                     stoedAlertDialog.dismiss()
+                    return
                 }
             } catch (e: java.lang.Exception) {
 
@@ -171,11 +238,15 @@ class HomeFragment() : Fragment(), View.OnClickListener {
             val saveStoredAlert = stoedAlertDialog.findViewById(R.id.saveStoredAlert) as Button
             val rvAlertaLayout = stoedAlertDialog.findViewById(R.id.rvAlertaLayout) as RecyclerView
             rvAlertaLayout.layoutManager = LinearLayoutManager(context!!)
-            storedAlertAdapter = StoredAlertAdapter(context!!, tagModelArray)
+            storedAlertAdapter = StoredAlertAdapter(context!!, tagModelArray, this@HomeFragment)
 
             rvAlertaLayout.adapter = storedAlertAdapter
             saveStoredAlert.setOnClickListener {
                 stoedAlertDialog.dismiss()
+                /*addSpace10XData()*/
+                sendStoredData()
+
+
             }
         } catch (e: Exception) {
 
@@ -202,6 +273,152 @@ class HomeFragment() : Fragment(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
+        when (v) {
+
+        }
+    }
+
+/*    override fun onRadioButtonClicked(text: String, model: TrailerTagModel, position: Int) {
+        *//* model.status = text*//*
+        tagModelArray[position] = model
+        isStoredOrMissing = model.toString()
+        tagModelArray.forEach {
+*//*            tagModelArrayStatus = it.status.toString()*//*
+        }
+
+        storedAlertAdapter.notifyDataSetChanged()
+
+    }*/
+
+  /*  private fun addSpace10XData() {
+        if (isOnline(context!!)) {
+            val currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC")).time
+
+            try {
+
+                tagModelArray.forEach {
+                    val list = ArrayList<AddSpace10XBTDataModel.Data>()
+                    val updateModel = AddSpace10XBTDataModel.Data(
+                        hexadecimalTimestamp, it.imei, isStoredOrMissing
+                    )
+                    list.add(updateModel)
+                    var model = AddSpace10XBTDataModel(macAddress, list)
+                    try {
+                        ApiInterface.createForRFT().addSpace10XBTData(
+                            "bt_" + "$" + "a*lGdNlIfzcY8h*KidxAoBff*LepB4onmJo1", model
+                        )
+                            .enqueue(object : Callback<AddSpace10XBTDataModel> {
+                                override fun onResponse(
+                                    call: Call<AddSpace10XBTDataModel>,
+                                    response: Response<AddSpace10XBTDataModel>
+                                ) {
+                                    if (response.isSuccessful) {
+
+                                    } else {
+
+                                    }
+                                }
+
+                                override fun onFailure(
+                                    call: Call<AddSpace10XBTDataModel>,
+                                    t: Throwable
+                                ) {
+                                    t.message.toString()
+                                }
+
+                            })
+                    } catch (e: Exception) {
+
+                    }
+
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+        }
+    }*/
+
+    private fun sendStoredData() {
+
+        if (tagModelArray.size > 0) {
+            val currentTime = Calendar.getInstance().time
+            val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val currentDateTime = dateTimeFormat.format(currentTime)
+
+            // Convert to UTC-8
+            val utcMinus8Format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            utcMinus8Format.timeZone = TimeZone.getTimeZone("GMT-8")
+            val utcMinus8DateTime = utcMinus8Format.format(currentTime)
+
+            // Convert to Unix timestamp in UTC-8
+            val utcMinus8UnixTimestamp = utcMinus8Format.parse(utcMinus8DateTime)?.time ?: -1
+
+            // Convert Unix timestamp to hexadecimal
+            val hexadecimalTimestamp = if (utcMinus8UnixTimestamp != -1L) {
+                java.lang.Long.toHexString(utcMinus8UnixTimestamp / 1000).toUpperCase()
+            } else {
+                "N/A"
+            }
+            val list = ArrayList<AddSpace10XBTDataModel.Data>()
+            var trailerModel = tagModelArray[tagModelArray.size - 1]
+            trailerModel.taglist.forEach {
+                val updateModel = AddSpace10XBTDataModel.Data(
+                    hexadecimalTimestamp, it.tagImei, it.status!!
+                )
+                list.add(updateModel)
+            }
+
+            var model = AddSpace10XBTDataModel(trailerModel.imei, list)
+            try {
+                ApiInterface.createForRFT().addSpace10XBTData(
+                    "bt_" + "$" + "a*lGdNlIfzcY8h*KidxAoBff*LepB4onmJo1", model
+                )
+                    .enqueue(object : Callback<AddSpace10XBTDataModel> {
+                        override fun onResponse(
+                            call: Call<AddSpace10XBTDataModel>,
+                            response: Response<AddSpace10XBTDataModel>
+                        ) {
+                            if (response.isSuccessful) {
+                                tagModelArray.removeAt(tagModelArray.size - 1)
+                                if (tagModelArray.size > 0) {
+                                    sendStoredData()
+                                }else{
+                                 /*Hide the progress bar here / dismis dialog here*/
+                                }
+                            } else {
+
+                            }
+                        }
+
+                        override fun onFailure(
+                            call: Call<AddSpace10XBTDataModel>,
+                            t: Throwable
+                        ) {
+//                            t.message.toString()
+                        }
+
+                    })
+            } catch (e: Exception) {
+
+            }
+        }
 
     }
+
+    override fun onRadioButtonClicked(text: String, model: TrailerTagModel.Tags, position: Int) {
+        for (i in tagModelArray.indices) {
+            model.status = text
+            if (tagModelArray[i].taglist.size >= position) {
+                if (tagModelArray[i].taglist[position].tagImei == model.tagImei) {
+                    tagModelArray[i].taglist[position] = model
+                    isStoredOrMissing = text
+                }
+            }
+        }
+        storedAlertAdapter.notifyDataSetChanged()
+    }
+
+
 }

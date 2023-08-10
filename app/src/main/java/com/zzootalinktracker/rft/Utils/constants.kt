@@ -30,6 +30,7 @@ const val DEVICE_ID = "device_id"
 const val USER_ID = "user_id"
 const val RFT_DRIVER_ID = "rft_driver_id"
 const val IMEI_ID = "IMEI_ID"
+const val MAC_ADDRESS = "MAC_ADDRESS"
 
 /*For Server States*/
 const val NO_INTERNET = 1

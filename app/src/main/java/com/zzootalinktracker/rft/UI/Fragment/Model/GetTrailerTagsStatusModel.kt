@@ -12,6 +12,11 @@ class GetTrailerTagsStatusModel(
         var tag1Name: String,
         var tag2: Boolean,
         var tag2Name: String,
+        var imei: String,
+        var tag1Imei: String,
+        var tag1IsMissingOrStored: String,
+        var tag2Imei: String,
+        var tag2IsMissingOrStored: String,
 
         ) {
 

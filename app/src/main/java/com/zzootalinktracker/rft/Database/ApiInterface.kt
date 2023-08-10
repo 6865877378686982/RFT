@@ -46,8 +46,7 @@ interface ApiInterface {
 
     @GET("get_last_login_device_history")
     fun getLastLoginDeviceHistory(
-        @Query("user_api_hash") user_api_hash: String,
-        @Query("device_id") device_id: String
+        @Query("user_api_hash") user_api_hash: String, @Query("device_id") device_id: String
     ): Call<GetLasLoginDeviceHistoryModel>
 
     @FormUrlEncoded
@@ -58,21 +57,23 @@ interface ApiInterface {
         @Field("user_id") user_id: String
     ): retrofit2.Call<UpdateVehicleAttributeResponse>
 
-
+    @POST("RFT/AddSpace10XBTData")
+    fun addSpace10XBTData(
+        @Query("key") key: String,
+        @Body body: AddSpace10XBTDataModel
+    ): Call<AddSpace10XBTDataModel>
 
     // Get Trailer, Tags & Status
 
     @GET("RFT/TrailerTagsAndStatus")
     fun getTrailerTagsStatus(
-        @Query("Key") Key: String,
-        @Query("RFTDriverId") RFTDriverId: String
+        @Query("Key") Key: String, @Query("RFTDriverId") RFTDriverId: String
     ): Call<GetTrailerTagsStatusModel>
 
 
     @GET("rft_login")
     fun rftLogin(
-        @Query("imei") imei: String,
-        @Query("versionAbove28") versionAbove28: Int
+        @Query("imei") imei: String, @Query("versionAbove28") versionAbove28: Int
     ): Call<RftLoginModel>
 
     @GET("RFT/TagsStatusHistory")

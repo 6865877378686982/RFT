@@ -39,7 +39,7 @@ class GetTrailerTagStatusService : Service() {
                             ApiInterface.createForRFT()
                                 .getTrailerTagsStatus(
                                     //      sessionManager.getApiHash(),
-                                    "$2y$10$" + "UxX6IwSI56UNrQGDNDOL/e2MM6fUVUU9LTx.8lnIQEDGFdRt.ZfUu",
+                                    "\$2y\$10\$4.wpOs8L6jrJTzgbQKvDwexF8FNvwX/FRrFEsvM/avo.ah8gGa1iC",
                                     "00" + sessionManager.getRftDriverId()
                                 ).enqueue(object : Callback<GetTrailerTagsStatusModel> {
                                     override fun onResponse(

@@ -1,6 +1,8 @@
 package com.zzootalinktracker.rft.UI.Fragment.Adapter
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,10 +53,29 @@ class ChillerAdapter(
             if (tag1 && tag2) {
                 ivChillerPadStatus.setImageResource((R.color.green))
             } else {
-                ivChillerPadStatus.setImageResource((R.color.red))
+                if (item.tag1IsMissingOrStored == "STORED" && item.tag2IsMissingOrStored == "STORED") {
+                    val backgroundColor = ContextCompat.getColor(context, R.color.amber)
+                    tvtag1Status.setTextColor(backgroundColor)
+                    tvtag2Status.setTextColor(backgroundColor)
+                    tvtag1Status.text = "STORED"
+                    tvtag2Status.text = "STORED"
+                }else{
+                    val backgroundColor = ContextCompat.getColor(context, R.color.red)
+                    tvtag1Status.setTextColor(backgroundColor)
+                    tvtag2Status.setTextColor(backgroundColor)
+                    tvtag1Status.text = "MISSING"
+                    tvtag2Status.text = "MISSING"
+                }
+                /*   ivChillerPadStatus.setImageResource((R.color.red))*/
+
             }
 
+            /*   val isTag1StoreOrMissing= item.tag1IsMissingOrStored
+               val isTag2StoreOrMissing= item.tag2IsMissingOrStored
+               if (isTag1StoreOrMissing == "STORED" && isTag2StoreOrMissing == "STORED"){
+                   ivChillerPadStatus.setImageResource((R.color.amber))
 
+               }*/
         }
     }
 

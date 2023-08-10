@@ -108,6 +108,17 @@ class SessionManager {
         return data
     }
 
+    public fun saveMacAddress(count: String?) {
+        if (count != null) {
+            saveStringData(MAC_ADDRESS, count)
+        }
+    }
+
+    public fun getMacAddress(): String {
+        val data = getStringData(MAC_ADDRESS)
+        return data
+    }
+
     public fun saveApiHash(count: String) {
         saveStringData(API_HASH, count)
     }
