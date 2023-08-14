@@ -6,18 +6,21 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.zzootalinktracker.android.Ui.Activity.SplashActivity
 import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.Utils.*
 
-class DeviceNotConfiguredScreen : AppCompatActivity() {
+class DeviceNotConfiguredScreen : AppCompatActivity(), View.OnClickListener {
     private lateinit var noDeviceConfiguredLayout: RelativeLayout
     private lateinit var noDeviceFoundLayout: RelativeLayout
     private lateinit var noInternetFoundLayout: RelativeLayout
     private lateinit var noServerFoundLayout: RelativeLayout
     private lateinit var noUserConfiguredLayout: RelativeLayout
     private lateinit var deactivatedLayout: RelativeLayout
+    private lateinit var btnTryAgain: Button
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +39,8 @@ class DeviceNotConfiguredScreen : AppCompatActivity() {
         noServerFoundLayout = findViewById(R.id.noServerFoundLayout)
         noUserConfiguredLayout = findViewById(R.id.noUserConfiguredLayout)
         deactivatedLayout = findViewById(R.id.deactivatedLayout)
+        btnTryAgain = findViewById(R.id.btnTryAgain)
+        btnTryAgain.setOnClickListener(this)
 
     }
 
@@ -94,5 +99,15 @@ class DeviceNotConfiguredScreen : AppCompatActivity() {
 
         }
 
+    }
+
+    override fun onClick(v: View?) {
+        when(v){
+            btnTryAgain -> {
+                finish()
+                val intent = Intent(applicationContext,SplashActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 }

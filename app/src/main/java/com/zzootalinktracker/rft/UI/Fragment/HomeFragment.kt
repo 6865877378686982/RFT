@@ -1,5 +1,6 @@
 package com.zzootalinktracker.rft.UI.Fragment
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.BroadcastReceiver
@@ -7,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.telephony.SmsManager
 import android.util.Log
@@ -64,7 +66,8 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     private var tagModelArrayStatus = ""
     private var macAddress = ""
     private lateinit var hexTimeStamp: String
-    private val PERMISSION_SEND_SMS = 123
+    private val SEND_SMS_PERMISSION_REQUEST = 1
+
 
 
     @SuppressLint("MissingInflatedId")
@@ -195,26 +198,24 @@ class HomeFragment() : Fragment(), View.OnClickListener,
         }
     }
 
-    @SuppressLint("SuspiciousIndentation")
-    private fun sendSMS() {
-        val phoneNumber = "8360082296"
-        val message = "Hello, Your tag is missing"
+private fun sendSMS() {
+    val phoneNumber = "8360082296" // Replace with the desired phone number
+    val message = "Hello, Your tag is missing." // Replace with your message content
 
-            try {
-                val smsManager = SmsManager.getDefault()
-                smsManager.sendTextMessage(phoneNumber, null, message, null, null)
-                Toast.makeText(context!!, "SMS sent successfully", Toast.LENGTH_SHORT).show()
-            } catch (ex: Exception) {
-                Toast.makeText(context!!, "SMS sending failed", Toast.LENGTH_SHORT).show()
-                ex.printStackTrace()
-            }
+    val smsIntent = Intent(Intent.ACTION_VIEW)
+    smsIntent.data = Uri.parse("sms:$phoneNumber")
+    smsIntent.putExtra("sms_body", message)
 
+    try {
+        startActivity(smsIntent)
+    } catch (ex: Exception) {
+        Toast.makeText(context!!, "Failed to open SMS app", Toast.LENGTH_SHORT).show()
+        ex.printStackTrace()
     }
-
-
+}
 
     private fun showStoredAlert() {
-        try {
+          try {
             if (requireActivity().isFinishing) {
                 return
             }
@@ -277,68 +278,6 @@ class HomeFragment() : Fragment(), View.OnClickListener,
 
         }
     }
-
-/*    override fun onRadioButtonClicked(text: String, model: TrailerTagModel, position: Int) {
-        *//* model.status = text*//*
-        tagModelArray[position] = model
-        isStoredOrMissing = model.toString()
-        tagModelArray.forEach {
-*//*            tagModelArrayStatus = it.status.toString()*//*
-        }
-
-        storedAlertAdapter.notifyDataSetChanged()
-
-    }*/
-
-  /*  private fun addSpace10XData() {
-        if (isOnline(context!!)) {
-            val currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC")).time
-
-            try {
-
-                tagModelArray.forEach {
-                    val list = ArrayList<AddSpace10XBTDataModel.Data>()
-                    val updateModel = AddSpace10XBTDataModel.Data(
-                        hexadecimalTimestamp, it.imei, isStoredOrMissing
-                    )
-                    list.add(updateModel)
-                    var model = AddSpace10XBTDataModel(macAddress, list)
-                    try {
-                        ApiInterface.createForRFT().addSpace10XBTData(
-                            "bt_" + "$" + "a*lGdNlIfzcY8h*KidxAoBff*LepB4onmJo1", model
-                        )
-                            .enqueue(object : Callback<AddSpace10XBTDataModel> {
-                                override fun onResponse(
-                                    call: Call<AddSpace10XBTDataModel>,
-                                    response: Response<AddSpace10XBTDataModel>
-                                ) {
-                                    if (response.isSuccessful) {
-
-                                    } else {
-
-                                    }
-                                }
-
-                                override fun onFailure(
-                                    call: Call<AddSpace10XBTDataModel>,
-                                    t: Throwable
-                                ) {
-                                    t.message.toString()
-                                }
-
-                            })
-                    } catch (e: Exception) {
-
-                    }
-
-                }
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-        }
-    }*/
 
     private fun sendStoredData() {
 

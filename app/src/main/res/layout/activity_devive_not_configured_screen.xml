@@ -24,7 +24,7 @@
         android:id="@+id/noServerFoundLayout"
         layout="@layout/no_server_found"
 
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <include
         android:id="@+id/noUserConfiguredLayout"
