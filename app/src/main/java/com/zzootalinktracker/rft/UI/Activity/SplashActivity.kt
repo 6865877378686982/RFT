@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.util.Log
@@ -17,10 +16,10 @@ import androidx.core.content.ContextCompat
 import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.Database.SessionManagerEmailSave
-import com.zzootalinktracker.rft.UI.Activity.MainActivity
 import com.zzootalinktracker.rft.R
-import com.zzootalinktracker.rft.UI.Fragment.Adapter.DeviceNotConfiguredScreen
+import com.zzootalinktracker.rft.UI.Activity.MainActivity
 import com.zzootalinktracker.rft.UI.Activity.Model.RftLoginModel
+import com.zzootalinktracker.rft.UI.Fragment.Adapter.DeviceNotConfiguredScreen
 import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -135,11 +134,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun checkLoginExist() {
-        if (sessionManager.getApiHash() == "") {
             rftLogin()
-        } else {
-            loadScreen()
-        }
     }
 
     private fun rftLogin() {
@@ -166,30 +161,20 @@ class SplashActivity : AppCompatActivity() {
                                             goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
                                             return
                                         }
-                                        val rftDriver = response.body()!!.data.rft_driver
-                                        if (rftDriver != null) {
-                                            val apiHash = rftDriver.user_api_hash
-                                            val deviceId = response.body()!!.data.id
-                                            val userId = response.body()!!.data.rft_driver.id
-                                            val email = response.body()!!.data.rft_driver.email
-                                            val rftDriverId =
-                                                response.body()!!.data.rft_driver.rft_driver_id
-                                            sessionManager.saveApiHash(apiHash)
-                                            sessionManager.saveDeviceId(deviceId)
-                                            sessionManager.saveUserId(userId)
+                                        val deviceId = response.body()!!.data.id
+                                        val rftDriverId = response.body()!!.data.rft_driver_id
+                                        sessionManager.saveDeviceId(deviceId)
+                                        if (rftDriverId != null) {
                                             sessionManager.saveRftDriverId(rftDriverId)
-                                            sessionManager.saveUserEmail(email)
-                                            sessionManager.saveLoginTimeStamp(
-                                                getCurrentDateTime24Hour()
-                                            )
-                                            val intent = Intent(
-                                                this@SplashActivity, MainActivity::class.java
-                                            )
-                                            startActivity(intent)
-                                        } else {
-                                            // show new screen - msg => your device is not configured
-                                            goToDeviceNotConfiguredScreen(USER_NOT_CONFIGURED)
                                         }
+                                        sessionManager.saveLoginTimeStamp(
+                                            getCurrentDateTime24Hour()
+                                        )
+                                        val intent = Intent(
+                                            this@SplashActivity, MainActivity::class.java
+                                        )
+                                        startActivity(intent)
+                                        finish()
                                     } else {
                                         // show new screen - msg => your device is not configured
                                         goToDeviceNotConfiguredScreen(DEVICE_NOT_CONFIGURED)
@@ -226,34 +211,6 @@ class SplashActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun goToLoginScreen() {
-        val handler = Handler()
-        handler.postDelayed(Runnable {
-            val intent = Intent(applicationContext, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-        }, 2000)
-    }
-
-    private fun loadScreen() {
-
-        val time = sessionManager.getLoginTimeStamp()
-        if (time == "") {
-            rftLogin()
-        } else {
-            val dateFormatter = getDateFormationOnly()
-            if (dateFormatter.parse(time) == dateFormatter.parse(getCurrentDateOnly())) {
-                val handler = Handler()
-                handler.postDelayed(Runnable {
-                    val intent = Intent(applicationContext, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }, 1000)
-            } else {
-                rftLogin()
-            }
-        }
-    }
 
 }
 

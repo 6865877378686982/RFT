@@ -1,24 +1,19 @@
 package com.zzootalinktracker.rft.UI.Fragment
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.telephony.SmsManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.*
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
@@ -37,13 +32,11 @@ import com.zzootalinktracker.rft.UI.Fragment.Adapter.StoredMissingTagsAdapter
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 import com.zzootalinktracker.rft.Utils.SUCCESS_STATUS_EDGE
 import com.zzootalinktracker.rft.Utils.getCurrentDateTime24Hour
-import com.zzootalinktracker.rft.Utils.isOnline
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class HomeFragment() : Fragment(), View.OnClickListener,
@@ -63,10 +56,7 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     private lateinit var tagModelArray: ArrayList<TrailerTagModel>
     private lateinit var stoedAlertDialog: Dialog
     private var isStoredOrMissing = ""
-    private var tagModelArrayStatus = ""
     private var macAddress = ""
-    private lateinit var hexTimeStamp: String
-    private val SEND_SMS_PERMISSION_REQUEST = 1
 
 
 
@@ -92,7 +82,6 @@ class HomeFragment() : Fragment(), View.OnClickListener,
             progressBar = viewLayout.findViewById(R.id.progressBar)
             tvDriverName = viewLayout.findViewById(R.id.tvDriverName)
             tvLastRefreshed = viewLayout.findViewById(R.id.tvLastRefreshed)
-            tvDriverName.text = "Hi, " + sessionManager.getUserEmail()
             rvChiller.layoutManager = LinearLayoutManager(context!!)
             showHideProgressBar(true)
             tagModelArray = ArrayList()
@@ -245,7 +234,7 @@ private fun sendSMS() {
             saveStoredAlert.setOnClickListener {
                 stoedAlertDialog.dismiss()
                 /*addSpace10XData()*/
-                sendStoredData()
+              //  sendStoredData()
 
 
             }

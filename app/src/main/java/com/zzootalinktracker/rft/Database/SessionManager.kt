@@ -119,14 +119,6 @@ class SessionManager {
         return data
     }
 
-    public fun saveApiHash(count: String) {
-        saveStringData(API_HASH, count)
-    }
-
-    public fun getApiHash(): String {
-        val data = getStringData(API_HASH)
-        return data
-    }
 
     public fun saveDeviceId(count: String) {
         saveStringData(DEVICE_ID, count)
@@ -136,27 +128,11 @@ class SessionManager {
         val data = getStringData(DEVICE_ID)
         return data
     }
-    public fun saveUserId(count: String?) {
-        if (count != null) {
-            saveStringData(USER_ID, count)
-        } else {
 
-        }
-    }
-    public fun getUserId(): String {
-        val data = getStringData(USER_ID)
-        return data
-    }
     public fun saveRftDriverId(count: String) {
         saveStringData(RFT_DRIVER_ID, count)
     }
-    public fun saveUserEmail(text: String) {
-        saveStringData("user_email", text)
-    }
-    public fun getUserEmail(): String {
-        val data = getStringData("user_email")
-        return data
-    }
+
     public fun getRftDriverId(): String {
         val data = getStringData(RFT_DRIVER_ID)
         return data

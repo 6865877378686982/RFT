@@ -21,7 +21,11 @@ import java.util.*
 
 
 /*Test URL*/
-var BASE_URL = "http://20.211.90.127/api/"
+/*var BASE_URL = "http://20.211.90.127/api/"*/
+
+/*Live*/
+var BASE_URL = "http://20.211.59.130/api/"
+
 var BASE_URL_RFT = "https://admin.zzoota.com/api/"
 
 const val LOGIN_TIMESTAMP = "logintimestamp"

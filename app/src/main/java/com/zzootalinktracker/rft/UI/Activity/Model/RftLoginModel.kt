@@ -11,18 +11,7 @@ class RftLoginModel(var status: Int, var message: String, var data: Data) {
         var active: Int,
         var name: String,
         var imei: String,
-        var rft_driver: rftDriver
-    ) {
+        var rft_driver_id: String
 
-        class rftDriver(
-            var id: String,
-            var active: Int,
-            var email: String,
-            var user_api_hash: String,
-            var rft_driver_id: String
-        ) {
-
-        }
-
-    }
+    )
 }
