@@ -1,20 +1,12 @@
 package com.zzootalinktracker.rft.Utils
 
 import android.content.Context
-import android.graphics.Color
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
-import android.view.View
-import android.view.WindowManager
-import android.widget.TextView
-import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.database.getStringOrNull
-import com.google.android.material.snackbar.Snackbar
-import com.zzootalinktracker.rft.R
+import com.flurry.android.FlurryAgent
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,6 +26,7 @@ const val DEVICE_ID = "device_id"
 const val USER_ID = "user_id"
 const val RFT_DRIVER_ID = "rft_driver_id"
 const val IMEI_ID = "IMEI_ID"
+const val ANDROID_ID = "android_id"
 const val MAC_ADDRESS = "MAC_ADDRESS"
 
 /*For Server States*/
@@ -102,7 +95,39 @@ fun getCurrentDateOnly(): String {
 }
 
 
+public fun convertTimeToRFt(time: String): String{
+    val serverFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val newFormat = SimpleDateFormat("hh:mm a dd'th' MMMM yyyy")
+    val dt: Date
+    var convertedTime = ""
+    try {
+        dt = serverFormat.parse(time)
+        println("Time Display: " + newFormat.format(dt)) // <-- I got result here
+        convertedTime = newFormat.format(dt)
+    } catch (e: ParseException) {
+        e.printStackTrace()
+    }
 
+    return convertedTime
+}
+
+fun addFlurryErrorEvents(
+    screen: String,
+    api: String,
+    imei: String,
+    sdkVersion:String,
+    error: String,
+    error_type: String
+) {
+    val flurry_parms: MutableMap<String, String> = HashMap()
+    flurry_parms["SCREEN"] = screen
+    flurry_parms["Api"] = api
+    flurry_parms["IMEI"] = imei
+    flurry_parms["SDK_VERSION"] = sdkVersion
+    flurry_parms["ERROR"] = error
+    flurry_parms["ERROR_TYPE"] = error_type
+    FlurryAgent.logEvent(api + " " + "ERROR", flurry_parms)
+}
 
 fun convertTime(time: String): String {
     val serverFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")

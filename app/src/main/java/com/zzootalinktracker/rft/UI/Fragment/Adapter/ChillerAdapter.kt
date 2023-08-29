@@ -14,10 +14,8 @@ import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 import de.hdodenhof.circleimageview.CircleImageView
 
 class ChillerAdapter(
-    var context: Context,
-    var mlist: ArrayList<GetTrailerTagsStatusModel.Data>
-) :
-    RecyclerView.Adapter<ChillerAdapter.ViewHolder>() {
+    var context: Context, var mlist: ArrayList<GetTrailerTagsStatusModel.Data>
+) : RecyclerView.Adapter<ChillerAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvTrailerName: TextView = itemView.findViewById(R.id.tvChillerName)
@@ -37,8 +35,19 @@ class ChillerAdapter(
                 tvtag1Status.text = "Connected"
                 tvtag1Status.setTextColor(ContextCompat.getColor(context, R.color.green))
             } else {
-                tvtag1Status.text = "Not Connected"
-                tvtag1Status.setTextColor(ContextCompat.getColor(context, R.color.red_rft))
+                if (item.tag1IsMissingOrStored == null) {
+                    tvtag1Status.text = "Not Connected"
+                    tvtag1Status.setTextColor(ContextCompat.getColor(context, R.color.red_rft))
+                } else {
+                    if (item.tag1IsMissingOrStored == "STORED") {
+                        tvtag1Status.setTextColor(ContextCompat.getColor(context, R.color.amber))
+                        tvtag1Status.text = "STORED"
+                    } else {
+                        tvtag1Status.setTextColor(ContextCompat.getColor(context, R.color.red))
+                        tvtag1Status.text = "MISSING"
+                    }
+                }
+
             }
 
             val tag2 = item.tag2
@@ -46,43 +55,41 @@ class ChillerAdapter(
                 tvtag2Status.text = "Connected"
                 tvtag2Status.setTextColor(ContextCompat.getColor(context, R.color.green))
             } else {
-                tvtag2Status.text = "Not Connected"
-                tvtag2Status.setTextColor(ContextCompat.getColor(context, R.color.red_rft))
+                if (item.tag2IsMissingOrStored == null) {
+                    tvtag2Status.text = "Not Connected"
+                    tvtag2Status.setTextColor(ContextCompat.getColor(context, R.color.red_rft))
+                } else {
+                    if (item.tag2IsMissingOrStored == "STORED") {
+                        tvtag2Status.setTextColor(ContextCompat.getColor(context, R.color.amber))
+                        tvtag2Status.text = "STORED"
+                    } else {
+                        tvtag2Status.setTextColor(ContextCompat.getColor(context, R.color.red))
+                        tvtag2Status.text = "MISSING"
+                    }
+                }
             }
 
             if (tag1 && tag2) {
-                ivChillerPadStatus.setImageResource((R.color.green))
+                ivChillerPadStatus.setImageResource(R.drawable.color_green)
             } else {
-                if (item.tag1IsMissingOrStored == "STORED" && item.tag2IsMissingOrStored == "STORED") {
-                    val backgroundColor = ContextCompat.getColor(context, R.color.amber)
-                    tvtag1Status.setTextColor(backgroundColor)
-                    tvtag2Status.setTextColor(backgroundColor)
-                    tvtag1Status.text = "STORED"
-                    tvtag2Status.text = "STORED"
-                }else{
-                    val backgroundColor = ContextCompat.getColor(context, R.color.red)
-                    tvtag1Status.setTextColor(backgroundColor)
-                    tvtag2Status.setTextColor(backgroundColor)
-                    tvtag1Status.text = "MISSING"
-                    tvtag2Status.text = "MISSING"
+                if (item.tag2IsMissingOrStored != null && item.tag1IsMissingOrStored != null) {
+                    if (item.tag2IsMissingOrStored == "STORED" && item.tag1IsMissingOrStored == "STORED") {
+                        ivChillerPadStatus.setImageResource(R.drawable.amber_color)
+                    } else {
+                        ivChillerPadStatus.setImageResource(R.drawable.solid_red)
+                    }
+                } else {
+                    ivChillerPadStatus.setImageResource(R.drawable.solid_red)
                 }
-                /*   ivChillerPadStatus.setImageResource((R.color.red))*/
 
             }
-
-            /*   val isTag1StoreOrMissing= item.tag1IsMissingOrStored
-               val isTag2StoreOrMissing= item.tag2IsMissingOrStored
-               if (isTag1StoreOrMissing == "STORED" && isTag2StoreOrMissing == "STORED"){
-                   ivChillerPadStatus.setImageResource((R.color.amber))
-
-               }*/
         }
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.chiller_layout, parent, false)
+        val itemView =
+            LayoutInflater.from(parent.context).inflate(R.layout.chiller_layout, parent, false)
         return ViewHolder(itemView)
     }
 

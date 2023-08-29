@@ -14,11 +14,10 @@
         app:cardCornerRadius="15sp">
 
 
-
         <RelativeLayout
-            android:padding="10sp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="10sp">
 
 
             <LinearLayout
@@ -26,46 +25,43 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:layout_width="25sp"
-                    android:visibility="gone"
-                    android:id="@+id/circularIv"
-                    android:src="@drawable/solid_red"
-                    android:layout_height="25sp"/>
                 <TextView
-                    android:id="@+id/tvCurrentDate"
+                    android:id="@+id/tvddateTimeInUserTimeZone"
+                    style="@style/black_bold_16sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Current Time Date"/>
+                    android:text="Have a safe drive!" />
 
                 <TextView
-                    android:id="@+id/tvChillerStatus"
+                    android:id="@+id/tvStatus"
+                    style="@style/black_simple_16sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Current Time Date"/>
+                    android:paddingTop="3sp"
+                    android:text="" />
 
                 <TextView
-                    android:id="@+id/tvChillerMsg"
+                    android:id="@+id/tvMessage"
+                    style="@style/black_simple_16sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Current Time Date"/>
-                <TextView
-                    android:id="@+id/tvSafeDrive"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Have a safe drive!"/>
+                    android:text="" />
 
+                <!--                <TextView-->
+                <!--                    android:id="@+id/tvDateTimeInUtcTime"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:gravity="center"-->
+                <!--                    android:text="Current Time Date"/>-->
 
 
             </LinearLayout>
 
 
         </RelativeLayout>
-
 
 
     </androidx.cardview.widget.CardView>

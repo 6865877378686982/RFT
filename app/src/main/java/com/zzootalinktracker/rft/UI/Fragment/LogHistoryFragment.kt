@@ -1,6 +1,8 @@
 package com.zzootalinktracker.rft.UI.Fragment
 
+import TrailerAdapter
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,6 +22,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.R
+import com.zzootalinktracker.rft.UI.Activity.Model.TrailerModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTagsStatusHistoryModel
 import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call
@@ -27,25 +30,28 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var recycler_view: RecyclerView
     private lateinit var sessionManager: SessionManager
     private lateinit var spinner: Spinner
+    private val version = Build.VERSION.SDK_INT
     private lateinit var noInternetLayout: RelativeLayout
     private lateinit var progressBarLayout: RelativeLayout
     private lateinit var noDataLayout: RelativeLayout
     private lateinit var mainLayoutLog: RelativeLayout
     private lateinit var noServerFound: RelativeLayout
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var trailerAdapter: TrailerAdapter
+    private lateinit var logHistoryList: ArrayList<GetTagsStatusHistoryModel.Data>
     val dropdownFilterList = arrayOf(
         "Today", "7 Days", "30 Days", "Custom"
     )
     private lateinit var viewLayout: View
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
 
         viewLayout = inflater.inflate(R.layout.fragment_log_history, container, false)
@@ -68,8 +74,10 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         progressBarLayout = viewLayout.findViewById(R.id.progressBarLayout)
         sessionManager = SessionManager(context!!)
         recycler_view.layoutManager = LinearLayoutManager(context!!)
-        val adapter =
-            ArrayAdapter(context!!, R.layout.spinner, dropdownFilterList)
+        logHistoryList = ArrayList()
+        trailerAdapter = TrailerAdapter(logHistoryList)
+        recycler_view.adapter = trailerAdapter
+        val adapter = ArrayAdapter(context!!, R.layout.spinner, dropdownFilterList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
         spinner.setSelection(0)
@@ -179,8 +187,7 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             val endDate = selection.second as Long
             val startDateString = convertMillisToDate(startDate)
             val endDateString = convertMillisToDate(endDate)
-            getTagsStatusHistory(startDateString, endDateString)
-            Log.e("Date123", "Date123")
+            getTagsStatusHistory(endDateString, startDateString)
 
         }
 
@@ -188,27 +195,32 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun convertMillisToDate(millis: Long): String {
-        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return sdf.format(Date(millis))
     }
 
     private fun getTagsStatusHistory(startDate: String, endDate: String) {
-            if (isOnline(context!!)) {
-                updateUI(PROGRESS_BAR)
-                try {
-                    ApiInterface.createForRFT().getTagsStatusHistory(
-                        "\$2y\$10$" + "UxX6IwSI56UNrQGDNDOL/e2MM6fUVUU9LTx.8lnIQEDGFdRt.ZfUu",
-                        "005087", startDate, endDate
-                    ).enqueue(object : Callback<GetTagsStatusHistoryModel> {
-                        override fun onResponse(
-                            call: Call<GetTagsStatusHistoryModel>,
-                            response: Response<GetTagsStatusHistoryModel>
-                        ) {
-                            if (response.isSuccessful) {
-
-                                if (response.body()!!.status == SUCCESS_STATUS_EDGE) {
-                                    if (response.body()!!.data != null) {
+        if (isOnline(context!!)) {
+            updateUI(PROGRESS_BAR)
+            try {
+                ApiInterface.createForRFT().getTagsStatusHistory(
+                    "$2y" + "$10" + "$4.wpOs8L6jrJTzgbQKvDwexF8FNvwX/FRrFEsvM/avo.ah8gGa1iC",
+                    sessionManager.getRftDriverId(),
+                    endDate,
+                    startDate
+                ).enqueue(object : Callback<GetTagsStatusHistoryModel> {
+                    override fun onResponse(
+                        call: Call<GetTagsStatusHistoryModel>,
+                        response: Response<GetTagsStatusHistoryModel>
+                    ) {
+                        if (response.isSuccessful) {
+                            if (response.body()!!.status == SUCCESS_STATUS_EDGE) {
+                                if (response.body()!!.data != null) {
+                                    if (response.body()!!.data.size > 0) {
+                                        logHistoryList.clear()
+                                        logHistoryList.addAll(response.body()!!.data)
                                         updateUI(ADAPTER_LAYOUT)
+                                        trailerAdapter.notifyDataSetChanged()
                                     } else {
                                         updateUI(NO_DATA_FOUND)
                                     }
@@ -216,28 +228,43 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                                 } else {
                                     updateUI(NO_DATA_FOUND)
                                 }
+
                             } else {
-                                updateUI(NO_SERVER)
+                                updateUI(NO_DATA_FOUND)
                             }
-
-                        }
-
-                        override fun onFailure(
-                            call: Call<GetTagsStatusHistoryModel>,
-                            t: Throwable
-                        ) {
+                        } else {
+                            addFlurryErrorEvents(
+                                "logHistoryFragment",
+                                "RFT/TagsStatusHistory",
+                                sessionManager.getIMEI(),
+                                version.toString(), response.message(), "apiUnsuccess"
+                            )
                             updateUI(NO_SERVER)
                         }
 
+                    }
 
-                    })
+                    override fun onFailure(
+                        call: Call<GetTagsStatusHistoryModel>, t: Throwable
+                    ) {
+                        addFlurryErrorEvents(
+                            "logHistoryFragment",
+                            "RFT/TagsStatusHistory",
+                            sessionManager.getIMEI(),
+                            version.toString(), t.message.toString(), "apiFailure"
+                        )
+                        updateUI(NO_SERVER)
+                    }
 
-                } catch (e: Exception) {
 
-                }
-            } else {
-                updateUI(NO_INTERNET)
+                })
+
+            } catch (e: Exception) {
+
             }
+        } else {
+            updateUI(NO_INTERNET)
+        }
     }
 
     override fun onRefresh() {

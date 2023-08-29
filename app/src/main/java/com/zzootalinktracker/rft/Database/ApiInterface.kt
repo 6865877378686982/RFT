@@ -1,6 +1,7 @@
 package com.zzootalinktracker.rft.Database
 
 import com.zzootalinktracker.rft.UI.Activity.Model.*
+import com.zzootalinktracker.rft.UI.Fragment.Model.GetDeviceDriverInfoModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTagsStatusHistoryModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 import retrofit2.Call
@@ -84,6 +85,13 @@ interface ApiInterface {
         @Query("EndDate") EndDate: String
 
     ): Call<GetTagsStatusHistoryModel>
+
+    @GET("RFT/GetDeviceDriverInfo")
+    fun getDeviceDriverInfo(
+        @Query("Version") Version: Int,
+        @Query("IMEI") IMEI: String,
+        @Query("AndroidId") AndroidId: String
+    ): Call<GetDeviceDriverInfoModel>
 
     /*Get Docket List*/
 //    @GET("h4h/get_dockets")

@@ -108,6 +108,16 @@ class SessionManager {
         return data
     }
 
+    fun saveAndroidID(count: String){
+        saveStringData(ANDROID_ID, count)
+
+    }
+
+    public fun getAndroidId(): String {
+        val data = getStringData(ANDROID_ID)
+        return data
+    }
+
     public fun saveMacAddress(count: String?) {
         if (count != null) {
             saveStringData(MAC_ADDRESS, count)
@@ -129,7 +139,7 @@ class SessionManager {
         return data
     }
 
-    public fun saveRftDriverId(count: String) {
+    fun saveRftDriverId(count: String) {
         saveStringData(RFT_DRIVER_ID, count)
     }
 

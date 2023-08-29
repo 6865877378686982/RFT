@@ -4,19 +4,42 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvAlertaLayout"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/saveStoredAlert"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:backgroundTint="@color/red_rft"
-        android:layout_marginEnd="15sp"
-        android:text="Save" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                style="@style/black_simple_16sp"
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:padding="5sp"
+                android:layout_width="match_parent"
+                android:text="Have you stored the Chiller Pads assigned to this trailer in the storage box below/within the cargo area of the trailer, or are they missing?"
+                android:layout_height="wrap_content">
+
+            </TextView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAlertaLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/saveStoredAlert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:backgroundTint="@color/red_rft"
+                android:layout_marginEnd="15sp"
+                android:text="Save" />
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
 
 
 </LinearLayout>

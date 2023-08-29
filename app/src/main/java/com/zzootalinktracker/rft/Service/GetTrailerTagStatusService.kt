@@ -2,6 +2,7 @@ package com.zzootalinktracker.rft.Service
 
 import android.app.Service
 import android.content.Intent
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
@@ -12,6 +13,7 @@ import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 
 import com.zzootalinktracker.rft.Utils.SUCCESS_STATUS_EDGE
+import com.zzootalinktracker.rft.Utils.addFlurryErrorEvents
 import com.zzootalinktracker.rft.Utils.isOnline
 import retrofit2.Call
 import retrofit2.Callback
@@ -22,7 +24,8 @@ class GetTrailerTagStatusService : Service() {
     lateinit var sessionManager: SessionManager
     var handler: Handler? = null
     var runnable: Runnable? = null
-    val REQUEST_TIME = 30000.toLong()
+    val REQUEST_TIME = 10000.toLong()
+    val version = Build.VERSION.SDK_INT
     override fun onBind(intent: Intent?): IBinder? {
 
         return null
@@ -40,7 +43,7 @@ class GetTrailerTagStatusService : Service() {
                                 .getTrailerTagsStatus(
                                     //      sessionManager.getApiHash(),
                                     "\$2y\$10\$4.wpOs8L6jrJTzgbQKvDwexF8FNvwX/FRrFEsvM/avo.ah8gGa1iC",
-                                    "00" + sessionManager.getRftDriverId()
+                                    "005087"
                                 ).enqueue(object : Callback<GetTrailerTagsStatusModel> {
                                     override fun onResponse(
                                         call: Call<GetTrailerTagsStatusModel>,
@@ -57,14 +60,28 @@ class GetTrailerTagStatusService : Service() {
                                                 )
                                                 LocalBroadcastManager.getInstance(applicationContext)
                                                     .sendBroadcast(intent)
-                                                Log.e("Service123","Service")
+                                                Log.e("Service123", "Service")
                                                 handler!!.postDelayed(runnable!!, REQUEST_TIME)
 
                                             } else {
 
                                             }
                                         } else {
-                                            runnable?.let { handler!!.postDelayed(it, REQUEST_TIME) }
+                                            runnable?.let {
+                                                handler!!.postDelayed(
+                                                    it,
+                                                    REQUEST_TIME
+                                                )
+                                            }
+
+                                            addFlurryErrorEvents(
+                                                "trailerTagService",
+                                                "trailerTagServiceApi",
+                                                sessionManager.getIMEI(),
+                                                version.toString(),
+                                                response.message(),
+                                                "apiUnsuccess"
+                                            )
                                         }
                                     }
 
@@ -73,6 +90,15 @@ class GetTrailerTagStatusService : Service() {
                                         t: Throwable
                                     ) {
                                         handler!!.postDelayed(runnable!!, REQUEST_TIME)
+
+                                        addFlurryErrorEvents(
+                                            "trailerTagService",
+                                            "trailerTagServiceApi",
+                                            sessionManager.getIMEI(),
+                                            version.toString(),
+                                            t.message.toString(),
+                                            "apiFailure"
+                                        )
                                     }
 
 

@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -31,6 +32,7 @@ import com.zzootalinktracker.rft.UI.Fragment.Adapter.StoredAlertAdapter
 import com.zzootalinktracker.rft.UI.Fragment.Adapter.StoredMissingTagsAdapter
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 import com.zzootalinktracker.rft.Utils.SUCCESS_STATUS_EDGE
+import com.zzootalinktracker.rft.Utils.addFlurryErrorEvents
 import com.zzootalinktracker.rft.Utils.getCurrentDateTime24Hour
 import retrofit2.Call
 import retrofit2.Callback
@@ -57,13 +59,11 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     private lateinit var stoedAlertDialog: Dialog
     private var isStoredOrMissing = ""
     private var macAddress = ""
-
-
+    private val version = Build.VERSION.SDK_INT
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
 
         viewLayout = inflater.inflate(R.layout.fragment_home, container, false)
@@ -125,60 +125,56 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                 val model = gson.fromJson(intentData, GetTrailerTagsStatusModel::class.java)
                 if (model.status == SUCCESS_STATUS_EDGE) {
                     if (model.data.size > 0) {
-                        if (tagModelArray.size == 0) {
-                            model.data.forEach {
-
-                                var list = ArrayList<TrailerTagModel.Tags>()
-                                if (!it.tag1) {
-                                    list.add(
-                                        TrailerTagModel.Tags(
-                                            "1",
-                                            null,
-                                            it.tag1Name, it.tag1Imei
-                                        )
-                                    )
-                                }
-                                if (!it.tag2) {
-                                    list.add(
-                                        TrailerTagModel.Tags(
-                                            "1",
-                                            null,
-                                            it.tag2Name, it.tag2Imei
-                                        )
-                                    )
-                                }
-                                if (list.size > 0) {
-                                    if (it.imei == "2302210003E9") {
-                                        val model =
-                                            TrailerTagModel(
-                                                it.trailerId,
-                                                it.trailerName,
-                                                it.imei,
-                                                list
-                                            )
-                                        tagModelArray.add(model)
-                                    }
-
-                                }
-                                macAddress = it.imei
-                             if (it.tag2IsMissingOrStored == "MISSING"){
-                                 sendSMS()
-                             }
-                            }
-                        }
-                        /*Got Those Tag which are disconnected*/
-                        showStoredAlert()
-
                         trailerList.clear()
                         trailerList.addAll(model.data)
                         showHideProgressBar(false)
                         adapter.notifyDataSetChanged()
+                        tagModelArray.clear()
+                        model.data.forEach {
+
+                            try {
+                                if (stoedAlertDialog != null) {
+                                    if(stoedAlertDialog.isShowing){
+                                        return
+                                    }
+
+                                }
+                            } catch (e: Exception) {
+
+                            }
+                            var list = ArrayList<TrailerTagModel.Tags>()
+
+
+                            if (!it.tag1 && it.tag1IsMissingOrStored == null) {
+                                list.add(
+                                    TrailerTagModel.Tags(
+                                        "1", null, it.tag1Name, it.tag1Imei
+                                    )
+                                )
+                            }
+                            if (!it.tag2 && it.tag2IsMissingOrStored == null) {
+                                list.add(
+                                    TrailerTagModel.Tags(
+                                        "1", null, it.tag2Name, it.tag2Imei
+                                    )
+                                )
+                            }
+                            if (list.size > 0) {
+                                if (it.imei == "2302210003E9") {
+                                    val model = TrailerTagModel(
+                                        it.trailerId, it.trailerName, it.imei, list
+                                    )
+                                    tagModelArray.add(model)
+                                    showStoredAlert()
+                                }
+
+                            }
+
+                        }
                     } else {
                         showHideProgressBar(false)
-                        /*Need to show no data found layout*/
                     }
                 } else {
-                    /*Need to show no data found layout*/
                     showHideProgressBar(false)
                 }
 
@@ -187,36 +183,19 @@ class HomeFragment() : Fragment(), View.OnClickListener,
         }
     }
 
-private fun sendSMS() {
-    val phoneNumber = "8360082296" // Replace with the desired phone number
-    val message = "Hello, Your tag is missing." // Replace with your message content
-
-    val smsIntent = Intent(Intent.ACTION_VIEW)
-    smsIntent.data = Uri.parse("sms:$phoneNumber")
-    smsIntent.putExtra("sms_body", message)
-
-    try {
-        startActivity(smsIntent)
-    } catch (ex: Exception) {
-        Toast.makeText(context!!, "Failed to open SMS app", Toast.LENGTH_SHORT).show()
-        ex.printStackTrace()
-    }
-}
-
     private fun showStoredAlert() {
-          try {
+        try {
             if (requireActivity().isFinishing) {
                 return
             }
-            try {
+          /*  try {
                 if (stoedAlertDialog != null) {
                     stoedAlertDialog.dismiss()
                     return
                 }
             } catch (e: java.lang.Exception) {
 
-            }
-
+            }*/
             stoedAlertDialog = Dialog(requireActivity())
             stoedAlertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             stoedAlertDialog.setCancelable(true)
@@ -232,11 +211,22 @@ private fun sendSMS() {
 
             rvAlertaLayout.adapter = storedAlertAdapter
             saveStoredAlert.setOnClickListener {
-                stoedAlertDialog.dismiss()
-                /*addSpace10XData()*/
-              //  sendStoredData()
 
-
+                var status = true
+                tagModelArray.forEach {
+                    it.taglist.forEach {
+                        if (it.status == null) {
+                            status = false
+                        }
+                    }
+                }
+                if (status) {
+                    sendStoredData()
+                    stoedAlertDialog.dismiss()
+                } else {
+                    Toast.makeText(context, "Please Select the status of tags", Toast.LENGTH_LONG)
+                        .show()
+                }
             }
         } catch (e: Exception) {
 
@@ -271,21 +261,28 @@ private fun sendSMS() {
     private fun sendStoredData() {
 
         if (tagModelArray.size > 0) {
-            val currentTime = Calendar.getInstance().time
+          /*  val currentTime = Calendar.getInstance().time
             val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            val currentDateTime = dateTimeFormat.format(currentTime)
+            val currentDateTime = dateTimeFormat.format(currentTime)*/
 
             // Convert to UTC-8
-            val utcMinus8Format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+          /*  val utcMinus8Format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             utcMinus8Format.timeZone = TimeZone.getTimeZone("GMT-8")
-            val utcMinus8DateTime = utcMinus8Format.format(currentTime)
+            val utcMinus8DateTime = utcMinus8Format.format(currentTime)*/
+
+            val currentTime = Calendar.getInstance().time
+            val utcDateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            utcDateTimeFormat.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC time zone
+            val utcDateTime = utcDateTimeFormat.format(currentTime)
 
             // Convert to Unix timestamp in UTC-8
-            val utcMinus8UnixTimestamp = utcMinus8Format.parse(utcMinus8DateTime)?.time ?: -1
+          /*  val utcMinus8UnixTimestamp = utcMinus8Format.parse(utcMinus8DateTime)?.time ?: -1*/
+            val utcUnixTimestamp = utcDateTimeFormat.parse(utcDateTime)?.time ?: -1
+
 
             // Convert Unix timestamp to hexadecimal
-            val hexadecimalTimestamp = if (utcMinus8UnixTimestamp != -1L) {
-                java.lang.Long.toHexString(utcMinus8UnixTimestamp / 1000).toUpperCase()
+            val hexadecimalTimestamp = if (utcUnixTimestamp != -1L) {
+                java.lang.Long.toHexString(utcUnixTimestamp / 1000).toUpperCase()
             } else {
                 "N/A"
             }
@@ -302,32 +299,49 @@ private fun sendSMS() {
             try {
                 ApiInterface.createForRFT().addSpace10XBTData(
                     "bt_" + "$" + "a*lGdNlIfzcY8h*KidxAoBff*LepB4onmJo1", model
-                )
-                    .enqueue(object : Callback<AddSpace10XBTDataModel> {
-                        override fun onResponse(
-                            call: Call<AddSpace10XBTDataModel>,
-                            response: Response<AddSpace10XBTDataModel>
-                        ) {
-                            if (response.isSuccessful) {
-                                tagModelArray.removeAt(tagModelArray.size - 1)
-                                if (tagModelArray.size > 0) {
-                                    sendStoredData()
-                                }else{
-                                 /*Hide the progress bar here / dismis dialog here*/
-                                }
+                ).enqueue(object : Callback<AddSpace10XBTDataModel> {
+                    override fun onResponse(
+                        call: Call<AddSpace10XBTDataModel>,
+                        response: Response<AddSpace10XBTDataModel>
+                    ) {
+                        if (response.isSuccessful) {
+                            tagModelArray.removeAt(tagModelArray.size - 1)
+                            if (tagModelArray.size > 0) {
+                                sendStoredData()
                             } else {
-
+                                Toast.makeText(
+                                    context, "Status successfully Updated", Toast.LENGTH_LONG
+                                ).show()
+                                /*Hide the progress bar here / dismis dialog here*/
+                                progressBar.visibility = View.GONE
                             }
-                        }
+                        } else {
+                            addFlurryErrorEvents(
+                                "homeFragment",
+                                "RFT/AddSpace10XBTData",
+                                sessionManager.getIMEI(),
+                                version.toString(),
+                                response.message(),
+                                "apiUnsuccess"
+                            )
 
-                        override fun onFailure(
-                            call: Call<AddSpace10XBTDataModel>,
-                            t: Throwable
-                        ) {
-//                            t.message.toString()
                         }
+                    }
 
-                    })
+                    override fun onFailure(
+                        call: Call<AddSpace10XBTDataModel>, t: Throwable
+                    ) {
+                        addFlurryErrorEvents(
+                            "homeFragment",
+                            "RFT/AddSpace10XBTData",
+                            sessionManager.getIMEI(),
+                            version.toString(),
+                            t.message.toString(),
+                            "apiFailure"
+                        )
+                    }
+
+                })
             } catch (e: Exception) {
 
             }

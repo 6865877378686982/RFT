@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.provider.Settings.Secure
 import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -20,6 +21,8 @@ import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.UI.Activity.MainActivity
 import com.zzootalinktracker.rft.UI.Activity.Model.RftLoginModel
 import com.zzootalinktracker.rft.UI.Fragment.Adapter.DeviceNotConfiguredScreen
+import com.zzootalinktracker.rft.UI.Fragment.Model.GetDeviceDriverInfoModel
+import com.zzootalinktracker.rft.UI.Fragment.Model.GetTagsStatusHistoryModel
 import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -45,7 +48,10 @@ class SplashActivity : AppCompatActivity() {
     private fun initView() {
         sessionManager = SessionManager(applicationContext)
         sessionManagerEmailSave = SessionManagerEmailSave(applicationContext)
-
+        val androidId = Secure.getString(
+            this.contentResolver, Secure.ANDROID_ID
+        )
+        sessionManager.saveAndroidID(androidId)
         askRequestsPermission()
     }
 
@@ -134,73 +140,89 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun checkLoginExist() {
-            rftLogin()
+        rftLogin()
     }
+
 
     private fun rftLogin() {
         try {
             if (isOnline(applicationContext)) {
                 try {
                     val version = Build.VERSION.SDK_INT
-                    var isVersionAbove28 = 0
-                    if (version < Build.VERSION_CODES.Q) {
-                        isVersionAbove28 = 0
-                    } else {
-                        isVersionAbove28 = 1
-                    }
-                    Log.e("imei------223", sessionManager.getIMEI())
-                    ApiInterface.create().rftLogin(sessionManager.getIMEI(), isVersionAbove28)
-                        .enqueue(object : Callback<RftLoginModel> {
-                            override fun onResponse(
-                                call: Call<RftLoginModel>, response: Response<RftLoginModel>
-                            ) {
-                                if (response.isSuccessful) {
-                                    if (response.body()!!.status == SUCCESS_STATUS) {
-                                        if (response.body()!!.data.active == 0) {
-                                            // show new screen -> msg => Please active device from link
-                                            goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
-                                            return
-                                        }
-                                        val deviceId = response.body()!!.data.id
-                                        val rftDriverId = response.body()!!.data.rft_driver_id
-                                        sessionManager.saveDeviceId(deviceId)
-                                        if (rftDriverId != null) {
-                                            sessionManager.saveRftDriverId(rftDriverId)
-                                        }
-                                        sessionManager.saveLoginTimeStamp(
-                                            getCurrentDateTime24Hour()
-                                        )
-                                        val intent = Intent(
-                                            this@SplashActivity, MainActivity::class.java
-                                        )
-                                        startActivity(intent)
-                                        finish()
-                                    } else {
-                                        // show new screen - msg => your device is not configured
-                                        goToDeviceNotConfiguredScreen(DEVICE_NOT_CONFIGURED)
-                                    }
+                    var isVersionAbove28 = if (version < Build.VERSION_CODES.Q) 0 else 1
+                    val apiInterface = ApiInterface.createForRFT()
+                    var imei = sessionManager.getIMEI()
+                    isVersionAbove28 = 1
+                    imei = "9d575a53786a98c8"
+                 /*   imei = "350675293717976"*/
+
+                    apiInterface.getDeviceDriverInfo(
+                        isVersionAbove28,
+                        if (isVersionAbove28 == 0) imei ?: "" else "",
+                        if (isVersionAbove28 == 1) imei ?: "" else ""
+                    ).enqueue(object : Callback<GetDeviceDriverInfoModel> {
+                        override fun onResponse(
+                            call: Call<GetDeviceDriverInfoModel>,
+                            response: Response<GetDeviceDriverInfoModel>
+                        ) {
+                            if (response.isSuccessful) {
+                                if (response.body()!!.status == SUCCESS_STATUS_EDGE) {
+                                    val driverId = response.body()!!.data.driverId
+                                    sessionManager.saveRftDriverId(driverId)
+                                    val intent = Intent(
+                                        this@SplashActivity, MainActivity::class.java
+                                    )
+                                    startActivity(intent)
+                                    finish()
                                 } else {
-                                    goToDeviceNotConfiguredScreen(NO_SERVER)
+                                    addFlurryErrorEvents(
+                                        this@SplashActivity.localClassName,
+                                        "GetDeviceDriverInfo",
+                                        sessionManager.getIMEI(),
+                                        version.toString(),
+                                        response.message(),
+                                        "apiUnsuccess"
+                                    )
+                                    goToDeviceNotConfiguredScreen(DEVICE_NOT_CONFIGURED)
                                 }
-
+                            } else {
+                                addFlurryErrorEvents(
+                                    this@SplashActivity.localClassName,
+                                    "GetDeviceDriverInfo",
+                                    sessionManager.getIMEI(),
+                                    version.toString(),
+                                    response.message(),
+                                    "apiUnsuccess"
+                                )
+                                goToDeviceNotConfiguredScreen(NO_SERVER)
                             }
+                        }
 
-                            override fun onFailure(call: Call<RftLoginModel>, t: Throwable) {
-                                goToDeviceNotConfiguredScreen(DEACTIVE_DEVICE)
-                            }
+                        override fun onFailure(call: Call<GetDeviceDriverInfoModel>, t: Throwable) {
+                            addFlurryErrorEvents(
+                                this@SplashActivity.localClassName,
+                                "GetDeviceDriverInfo",
+                                sessionManager.getIMEI(),
+                                version.toString(),
+                                t.message.toString(),
+                                "apiFailure"
+                            )
+                            goToDeviceNotConfiguredScreen(NO_SERVER)
+                        }
 
+                    })
 
-                        })
                 } catch (e: Exception) {
-                    Log.e("hi", e.toString())
+                    goToDeviceNotConfiguredScreen(NO_SERVER)
                 }
-            } else {
+            }else{
                 goToDeviceNotConfiguredScreen(NO_INTERNET)
             }
         } catch (e: Exception) {
-            Log.e("spash", e.message.toString())
+            goToDeviceNotConfiguredScreen(NO_SERVER)
         }
     }
+
 
     private fun goToDeviceNotConfiguredScreen(type: Int) {
         val intent = Intent(
@@ -213,4 +235,5 @@ class SplashActivity : AppCompatActivity() {
 
 
 }
+
 
