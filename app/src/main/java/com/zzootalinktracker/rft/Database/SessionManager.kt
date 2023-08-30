@@ -20,38 +20,12 @@ class SessionManager {
 
     }
 
- /*   public fun getBreakList(): BreakTimingsModel? {
-        val data = getStringData(BreakList)
-        if (data != "") {
-            var gson = Gson()
-            var loginModel = gson.fromJson(data, BreakTimingsModel::class.java)
-            return loginModel
-        }
-        return null
-    }*/
 
     public fun saveStringData(key_name: String, key_value: String) {
         val editor = manager.edit()
         editor.putString(key_name, key_value)
         editor.apply()
     }
-
-    fun saveCustomerApproachAlertData(key_name: String, key_value: String) {
-        val editor = manager.edit()
-        editor.putString(key_name, key_value)
-        editor.apply()
-
-    }
-/*
-    public fun getCustomerApproachAlertData(key_name: String): GetCustomerApproachAlertsModel? {
-        val data = getStringData(key_name)
-        if (data != "") {
-            val gson = Gson()
-            val deviceModel = gson.fromJson(data, GetCustomerApproachAlertsModel::class.java)
-            return deviceModel
-        }
-        return null
-    }*/
 
     public fun saveIntData(key_name: String, key_value: Int) {
         val editor = manager.edit()
@@ -93,12 +67,6 @@ class SessionManager {
         editor.apply()
     }
 
-
-
-
-
-
-
     public fun saveIMEI(count: String) {
         saveStringData(IMEI_ID, count)
     }
@@ -108,36 +76,6 @@ class SessionManager {
         return data
     }
 
-    fun saveAndroidID(count: String){
-        saveStringData(ANDROID_ID, count)
-
-    }
-
-    public fun getAndroidId(): String {
-        val data = getStringData(ANDROID_ID)
-        return data
-    }
-
-    public fun saveMacAddress(count: String?) {
-        if (count != null) {
-            saveStringData(MAC_ADDRESS, count)
-        }
-    }
-
-    public fun getMacAddress(): String {
-        val data = getStringData(MAC_ADDRESS)
-        return data
-    }
-
-
-    public fun saveDeviceId(count: String) {
-        saveStringData(DEVICE_ID, count)
-    }
-
-    public fun getDeviceId(): String {
-        val data = getStringData(DEVICE_ID)
-        return data
-    }
 
     fun saveRftDriverId(count: String) {
         saveStringData(RFT_DRIVER_ID, count)
@@ -145,6 +83,15 @@ class SessionManager {
 
     public fun getRftDriverId(): String {
         val data = getStringData(RFT_DRIVER_ID)
+        return data
+    }
+
+    public fun saveDriverName(count: String) {
+        saveStringData("driver_name", count)
+    }
+
+    public fun getDriverName(): String {
+        val data = getStringData("driver_name")
         return data
     }
 

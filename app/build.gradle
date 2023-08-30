@@ -11,13 +11,13 @@ android {
         applicationId "com.zzootalinktracker.rft"
         minSdk 24
         targetSdk 33
-        versionCode 3
-        versionName "1.0.3"
+        versionCode 4
+        versionName "1.0.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
         debug {
-            storeFile file('D:\\zzoota git projects\\RFT - 28-July-2023\\RFT\\app\\rft_jks.jks')
+            storeFile file('D:\\ZZoota Projects\\RFT\\app\\rft_jks.jks')
             storePassword 'android'
             keyAlias 'key0'
             keyPassword 'android'
@@ -61,5 +61,8 @@ dependencies {
     implementation 'com.flurry.android:analytics:13.3.0@aar'
     implementation 'me.drakeet.support:toastcompat:1.1.0'
     implementation 'com.google.android.libraries.places:places:3.0.0'
+    implementation 'com.flurry.android:analytics:13.3.0@aar'
+    implementation 'com.microsoft.signalr:signalr:5.0.6'
+
 
 }

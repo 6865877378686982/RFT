@@ -7,22 +7,22 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.provider.Settings.Secure
 import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.gson.Gson
 import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.Database.SessionManagerEmailSave
 import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.UI.Activity.MainActivity
-import com.zzootalinktracker.rft.UI.Activity.Model.RftLoginModel
 import com.zzootalinktracker.rft.UI.Fragment.Adapter.DeviceNotConfiguredScreen
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetDeviceDriverInfoModel
-import com.zzootalinktracker.rft.UI.Fragment.Model.GetTagsStatusHistoryModel
+import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -48,10 +48,6 @@ class SplashActivity : AppCompatActivity() {
     private fun initView() {
         sessionManager = SessionManager(applicationContext)
         sessionManagerEmailSave = SessionManagerEmailSave(applicationContext)
-        val androidId = Secure.getString(
-            this.contentResolver, Secure.ANDROID_ID
-        )
-        sessionManager.saveAndroidID(androidId)
         askRequestsPermission()
     }
 
@@ -154,6 +150,7 @@ class SplashActivity : AppCompatActivity() {
                     var imei = sessionManager.getIMEI()
                     isVersionAbove28 = 1
                     imei = "9d575a53786a98c8"
+                 //   imei = "869196033386166"
                  /*   imei = "350675293717976"*/
 
                     apiInterface.getDeviceDriverInfo(
@@ -168,13 +165,27 @@ class SplashActivity : AppCompatActivity() {
                             if (response.isSuccessful) {
                                 if (response.body()!!.status == SUCCESS_STATUS_EDGE) {
                                     val driverId = response.body()!!.data.driverId
-                                    sessionManager.saveRftDriverId(driverId)
+                                    if (driverId != null) {
+                                        sessionManager.saveRftDriverId("005087")
+                                    }
+                                    val firstName = response.body()!!.data.firstName
+                                    val lasttName = response.body()!!.data.lastName
+                                    var name = ""
+                                    if (firstName != null) {
+                                        name = firstName
+                                    }
+                                    if (lasttName != null) {
+                                        name = "$name $lasttName"
+                                    }
+                                    sessionManager.saveDriverName(name)
+                                    sessionManager.saveLoginTimeStamp(getCurrentDateTime24Hour())
                                     val intent = Intent(
                                         this@SplashActivity, MainActivity::class.java
                                     )
                                     startActivity(intent)
                                     finish()
                                 } else {
+                                    goToDeviceNotConfiguredScreen(DEVICE_NOT_CONFIGURED)
                                     addFlurryErrorEvents(
                                         this@SplashActivity.localClassName,
                                         "GetDeviceDriverInfo",
@@ -183,7 +194,6 @@ class SplashActivity : AppCompatActivity() {
                                         response.message(),
                                         "apiUnsuccess"
                                     )
-                                    goToDeviceNotConfiguredScreen(DEVICE_NOT_CONFIGURED)
                                 }
                             } else {
                                 addFlurryErrorEvents(
@@ -232,6 +242,8 @@ class SplashActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
+
 
 
 }

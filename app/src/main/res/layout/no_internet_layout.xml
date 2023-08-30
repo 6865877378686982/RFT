@@ -7,14 +7,14 @@
 
     <ImageView
         android:id="@+id/ivNoWifi"
-        android:layout_width="250sp"
-        android:layout_height="250sp"
+        android:layout_width="230sp"
+        android:layout_height="230sp"
         android:layout_centerInParent="true"
         android:src="@drawable/no_wifi"
-        app:tint="@color/black" />
+        app:tint="@color/red_rft" />
 
     <TextView
-        style="@style/black_bold_18sp"
+        style="@style/black_bold_16sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/ivNoWifi"

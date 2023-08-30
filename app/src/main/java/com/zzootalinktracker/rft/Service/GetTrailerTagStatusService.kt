@@ -7,7 +7,11 @@ import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.flurry.android.FlurryAgent
 import com.google.gson.Gson
+import com.microsoft.signalr.HubConnection
+import com.microsoft.signalr.HubConnectionBuilder
+import com.microsoft.signalr.TransportEnum
 import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
@@ -18,21 +22,65 @@ import com.zzootalinktracker.rft.Utils.isOnline
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.HashMap
 
 class GetTrailerTagStatusService : Service() {
 
     lateinit var sessionManager: SessionManager
     var handler: Handler? = null
     var runnable: Runnable? = null
-    val REQUEST_TIME = 10000.toLong()
+    val REQUEST_TIME = 15000.toLong()
     val version = Build.VERSION.SDK_INT
+
+    val serverUrlSignalR = "wss://admin.zzoota.com/GetTagsNotifications"
+    private lateinit var hubConnection: HubConnection
     override fun onBind(intent: Intent?): IBinder? {
 
         return null
     }
+    private fun startSignalRLatest() {
+        try {
 
+            hubConnection = HubConnectionBuilder.create(serverUrlSignalR)
+                .withTransport(TransportEnum.WEBSOCKETS).build()
+
+            hubConnection.on("device_" + sessionManager.getRftDriverId(), { message ->
+                try {
+                    val manager = LocalBroadcastManager.getInstance(applicationContext)
+                    val intent1 = Intent()
+                    intent1.action = "trip_refresh"
+                    manager.sendBroadcast(intent1)
+
+                } catch (e: Exception) {
+                    val flurry_parms: MutableMap<String, String> = HashMap()
+                    flurry_parms["Api"] = "signalR"
+                    flurry_parms["message"] = e.message.toString()
+                    flurry_parms["IMEI"] = sessionManager.getIMEI()
+                    FlurryAgent.logEvent("signalR 3", flurry_parms)
+                }
+
+            }, String::class.java)
+
+            hubConnection.start().blockingAwait()
+
+        } catch (e: NullPointerException) {
+            val flurry_parms: MutableMap<String, String> = HashMap()
+            flurry_parms["Api"] = "signalR"
+            flurry_parms["message"] = e.message.toString()
+            flurry_parms["IMEI"] = sessionManager.getIMEI()
+            FlurryAgent.logEvent("signalR 1", flurry_parms)
+        } catch (e: Exception) {
+            val flurry_parms: MutableMap<String, String> = HashMap()
+            flurry_parms["Api"] = "signalR"
+            flurry_parms["message"] = e.message.toString()
+            flurry_parms["IMEI"] = sessionManager.getIMEI()
+            FlurryAgent.logEvent("signalR 2", flurry_parms)
+        }
+
+    }
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         sessionManager = SessionManager(this)
+       /* startSignalRLatest()*/
         handler = Handler()
         runnable = object : Runnable {
             override fun run() {
@@ -41,9 +89,8 @@ class GetTrailerTagStatusService : Service() {
                         try {
                             ApiInterface.createForRFT()
                                 .getTrailerTagsStatus(
-                                    //      sessionManager.getApiHash(),
                                     "\$2y\$10\$4.wpOs8L6jrJTzgbQKvDwexF8FNvwX/FRrFEsvM/avo.ah8gGa1iC",
-                                    "005087"
+                                    sessionManager.getRftDriverId()
                                 ).enqueue(object : Callback<GetTrailerTagsStatusModel> {
                                     override fun onResponse(
                                         call: Call<GetTrailerTagsStatusModel>,
@@ -64,16 +111,14 @@ class GetTrailerTagStatusService : Service() {
                                                 handler!!.postDelayed(runnable!!, REQUEST_TIME)
 
                                             } else {
-
+                                                val intent = Intent("unsucesssfull")
+                                                LocalBroadcastManager.getInstance(applicationContext)
+                                                    .sendBroadcast(intent)
                                             }
                                         } else {
-                                            runnable?.let {
-                                                handler!!.postDelayed(
-                                                    it,
-                                                    REQUEST_TIME
-                                                )
-                                            }
-
+                                            val intent = Intent("unsucesssfull")
+                                            LocalBroadcastManager.getInstance(applicationContext)
+                                                .sendBroadcast(intent)
                                             addFlurryErrorEvents(
                                                 "trailerTagService",
                                                 "trailerTagServiceApi",
@@ -82,6 +127,12 @@ class GetTrailerTagStatusService : Service() {
                                                 response.message(),
                                                 "apiUnsuccess"
                                             )
+                                            runnable?.let {
+                                                handler!!.postDelayed(
+                                                    it,
+                                                    REQUEST_TIME
+                                                )
+                                            }
                                         }
                                     }
 
@@ -89,8 +140,9 @@ class GetTrailerTagStatusService : Service() {
                                         call: Call<GetTrailerTagsStatusModel>,
                                         t: Throwable
                                     ) {
-                                        handler!!.postDelayed(runnable!!, REQUEST_TIME)
-
+                                        val intent = Intent("failure")
+                                        LocalBroadcastManager.getInstance(applicationContext)
+                                            .sendBroadcast(intent)
                                         addFlurryErrorEvents(
                                             "trailerTagService",
                                             "trailerTagServiceApi",
@@ -99,6 +151,7 @@ class GetTrailerTagStatusService : Service() {
                                             t.message.toString(),
                                             "apiFailure"
                                         )
+                                        handler!!.postDelayed(runnable!!, REQUEST_TIME)
                                     }
 
 

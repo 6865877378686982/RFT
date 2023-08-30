@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -31,9 +30,7 @@ import com.zzootalinktracker.rft.UI.Fragment.Adapter.ChillerAdapter
 import com.zzootalinktracker.rft.UI.Fragment.Adapter.StoredAlertAdapter
 import com.zzootalinktracker.rft.UI.Fragment.Adapter.StoredMissingTagsAdapter
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
-import com.zzootalinktracker.rft.Utils.SUCCESS_STATUS_EDGE
-import com.zzootalinktracker.rft.Utils.addFlurryErrorEvents
-import com.zzootalinktracker.rft.Utils.getCurrentDateTime24Hour
+import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -53,10 +50,13 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     private lateinit var adapter: ChillerAdapter
     private lateinit var storedAlertAdapter: StoredAlertAdapter
     private lateinit var progressBar: LinearLayout
+    private lateinit var dataNotFoundhome: LinearLayout
+    private lateinit var noServerFoundhome: LinearLayout
     private lateinit var viewLayout: View
     private lateinit var tvLastRefreshed: TextView
     private lateinit var tagModelArray: ArrayList<TrailerTagModel>
     private lateinit var stoedAlertDialog: Dialog
+    private lateinit var btnTryAgainNoData: Button
     private var isStoredOrMissing = ""
     private var macAddress = ""
     private val version = Build.VERSION.SDK_INT
@@ -80,10 +80,18 @@ class HomeFragment() : Fragment(), View.OnClickListener,
             rvChiller = viewLayout.findViewById(R.id.rvChiller)
             scrollView = viewLayout.findViewById(R.id.scrollView)
             progressBar = viewLayout.findViewById(R.id.progressBar)
+            noServerFoundhome = viewLayout.findViewById(R.id.noServerFoundhome)
             tvDriverName = viewLayout.findViewById(R.id.tvDriverName)
             tvLastRefreshed = viewLayout.findViewById(R.id.tvLastRefreshed)
+            dataNotFoundhome = viewLayout.findViewById(R.id.dataNotFoundhome)
+            btnTryAgainNoData = viewLayout.findViewById(R.id.btnTryAgainNoData)
+            btnTryAgainNoData.visibility = View.GONE
             rvChiller.layoutManager = LinearLayoutManager(context!!)
-            showHideProgressBar(true)
+            updateUI(PROGRESS_BAR)
+            var driverName = sessionManager.getDriverName()
+            if (driverName != "") {
+                tvDriverName.text = "Hey, $driverName"
+            }
             tagModelArray = ArrayList()
             setAdapter()
         } catch (e: Exception) {
@@ -91,16 +99,35 @@ class HomeFragment() : Fragment(), View.OnClickListener,
         }
     }
 
-    private fun showHideProgressBar(yes: Boolean) {
-        if (yes) {
-            progressBar.visibility = View.VISIBLE
-            scrollView.visibility = View.GONE
-        } else {
-            progressBar.visibility = View.GONE
-            scrollView.visibility = View.VISIBLE
+    private fun updateUI(type: Int) {
+        when (type) {
+            ADAPTER_LAYOUT -> {
+                progressBar.visibility = View.GONE
+                scrollView.visibility = View.VISIBLE
+                dataNotFoundhome.visibility = View.GONE
+                noServerFoundhome.visibility = View.GONE
+            }
+            NO_DATA_FOUND -> {
+                progressBar.visibility = View.GONE
+                scrollView.visibility = View.GONE
+                noServerFoundhome.visibility = View.GONE
+                dataNotFoundhome.visibility = View.VISIBLE
+            }
+            PROGRESS_BAR -> {
+                progressBar.visibility = View.VISIBLE
+                scrollView.visibility = View.GONE
+                noServerFoundhome.visibility = View.GONE
+                dataNotFoundhome.visibility = View.GONE
+            }
+            NO_SERVER -> {
+                progressBar.visibility = View.GONE
+                scrollView.visibility = View.GONE
+                noServerFoundhome.visibility = View.VISIBLE
+                dataNotFoundhome.visibility = View.GONE
+            }
         }
-
     }
+
 
     private fun setAdapter() {
         try {
@@ -124,17 +151,17 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                 val gson = Gson()
                 val model = gson.fromJson(intentData, GetTrailerTagsStatusModel::class.java)
                 if (model.status == SUCCESS_STATUS_EDGE) {
-                    if (model.data.size > 0) {
+                    if (model.data.size < 0) {
                         trailerList.clear()
                         trailerList.addAll(model.data)
-                        showHideProgressBar(false)
                         adapter.notifyDataSetChanged()
+                        updateUI(ADAPTER_LAYOUT)
                         tagModelArray.clear()
                         model.data.forEach {
 
                             try {
                                 if (stoedAlertDialog != null) {
-                                    if(stoedAlertDialog.isShowing){
+                                    if (stoedAlertDialog.isShowing) {
                                         return
                                     }
 
@@ -172,13 +199,15 @@ class HomeFragment() : Fragment(), View.OnClickListener,
 
                         }
                     } else {
-                        showHideProgressBar(false)
+                        updateUI(NO_DATA_FOUND)
                     }
-                } else {
-                    showHideProgressBar(false)
                 }
-
-
+            }
+            if (intent.action == "failure") {
+                updateUI(NO_SERVER)
+            }
+            if (intent.action == "unsucesssfull") {
+                updateUI(NO_DATA_FOUND)
             }
         }
     }
@@ -188,14 +217,6 @@ class HomeFragment() : Fragment(), View.OnClickListener,
             if (requireActivity().isFinishing) {
                 return
             }
-          /*  try {
-                if (stoedAlertDialog != null) {
-                    stoedAlertDialog.dismiss()
-                    return
-                }
-            } catch (e: java.lang.Exception) {
-
-            }*/
             stoedAlertDialog = Dialog(requireActivity())
             stoedAlertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             stoedAlertDialog.setCancelable(true)
@@ -244,6 +265,10 @@ class HomeFragment() : Fragment(), View.OnClickListener,
         val intentFilter = IntentFilter("TRAILER_STATUS_UPDATE")
         LocalBroadcastManager.getInstance(requireContext())
             .registerReceiver(trailerStatusReceiver, intentFilter)
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(trailerStatusReceiver, IntentFilter("unsucesssfull"))
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(trailerStatusReceiver, IntentFilter("failure"))
     }
 
     override fun onStop() {
@@ -261,25 +286,11 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     private fun sendStoredData() {
 
         if (tagModelArray.size > 0) {
-          /*  val currentTime = Calendar.getInstance().time
-            val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            val currentDateTime = dateTimeFormat.format(currentTime)*/
-
-            // Convert to UTC-8
-          /*  val utcMinus8Format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            utcMinus8Format.timeZone = TimeZone.getTimeZone("GMT-8")
-            val utcMinus8DateTime = utcMinus8Format.format(currentTime)*/
-
             val currentTime = Calendar.getInstance().time
             val utcDateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             utcDateTimeFormat.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC time zone
             val utcDateTime = utcDateTimeFormat.format(currentTime)
-
-            // Convert to Unix timestamp in UTC-8
-          /*  val utcMinus8UnixTimestamp = utcMinus8Format.parse(utcMinus8DateTime)?.time ?: -1*/
             val utcUnixTimestamp = utcDateTimeFormat.parse(utcDateTime)?.time ?: -1
-
-
             // Convert Unix timestamp to hexadecimal
             val hexadecimalTimestamp = if (utcUnixTimestamp != -1L) {
                 java.lang.Long.toHexString(utcUnixTimestamp / 1000).toUpperCase()
@@ -360,6 +371,61 @@ class HomeFragment() : Fragment(), View.OnClickListener,
             }
         }
         storedAlertAdapter.notifyDataSetChanged()
+    }
+
+
+    private fun getTrailerTagsStatus() {
+        try {
+            if (isOnline(context!!)) {
+                try {
+                    ApiInterface.createForRFT().getTrailerTagsStatus(
+                        "\$2y\$10\$4.wpOs8L6jrJTzgbQKvDwexF8FNvwX/FRrFEsvM/avo.ah8gGa1iC",
+                        sessionManager.getRftDriverId()
+                    ).enqueue(object : Callback<GetTrailerTagsStatusModel> {
+                        override fun onResponse(
+                            call: Call<GetTrailerTagsStatusModel>,
+                            response: Response<GetTrailerTagsStatusModel>
+                        ) {
+                            if (response.isSuccessful) {
+                                val responseBody = response.body()
+                                if (responseBody != null && responseBody.status == SUCCESS_STATUS_EDGE) {
+                                    val jsonString = Gson().toJson(responseBody)
+
+
+                                } else {
+
+                                }
+                            } else {
+
+                            }
+                        }
+
+                        override fun onFailure(
+                            call: Call<GetTrailerTagsStatusModel>, t: Throwable
+                        ) {
+
+                            addFlurryErrorEvents(
+                                "trailerTagService",
+                                "trailerTagServiceApi",
+                                sessionManager.getIMEI(),
+                                version.toString(),
+                                t.message.toString(),
+                                "apiFailure"
+                            )
+                        }
+
+
+                    })
+
+                } catch (e: Exception) {
+                }
+            } else {
+
+            }
+
+        } catch (e: Exception) {
+
+        }
     }
 
 

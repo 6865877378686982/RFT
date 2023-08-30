@@ -4,14 +4,10 @@ import TrailerAdapter
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.RelativeLayout
-import android.widget.Spinner
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,7 +18,6 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.R
-import com.zzootalinktracker.rft.UI.Activity.Model.TrailerModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTagsStatusHistoryModel
 import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call
@@ -30,15 +25,17 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
-class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
+class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener,
+    View.OnClickListener {
     private lateinit var recycler_view: RecyclerView
     private lateinit var sessionManager: SessionManager
     private lateinit var spinner: Spinner
     private val version = Build.VERSION.SDK_INT
     private lateinit var noInternetLayout: RelativeLayout
+    private lateinit var btnTryAgain: Button
+    private lateinit var btnTryAgainNoData: Button
     private lateinit var progressBarLayout: RelativeLayout
     private lateinit var noDataLayout: RelativeLayout
     private lateinit var mainLayoutLog: RelativeLayout
@@ -69,11 +66,15 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         swipeRefreshLayout.setOnRefreshListener(this)
         noInternetLayout = viewLayout.findViewById(R.id.noInternetLayout)
         noDataLayout = viewLayout.findViewById(R.id.noDataLayout)
+        btnTryAgain = viewLayout.findViewById(R.id.btnTryAgain)
         noServerFound = viewLayout.findViewById(R.id.noServerFound)
         mainLayoutLog = viewLayout.findViewById(R.id.mainLayoutLog)
+        btnTryAgainNoData = viewLayout.findViewById(R.id.btnTryAgainNoData)
         progressBarLayout = viewLayout.findViewById(R.id.progressBarLayout)
         sessionManager = SessionManager(context!!)
         recycler_view.layoutManager = LinearLayoutManager(context!!)
+        btnTryAgain.setOnClickListener(this)
+        btnTryAgainNoData.setOnClickListener(this)
         logHistoryList = ArrayList()
         trailerAdapter = TrailerAdapter(logHistoryList)
         recycler_view.adapter = trailerAdapter
@@ -270,6 +271,14 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onRefresh() {
         swipeRefreshLayout.isRefreshing = false
         getTagsStatusHistory(getCurrentDateForEdge(), getCurrentDateForEdge())
+    }
+
+    override fun onClick(p0: View?) {
+        when (p0) {
+            btnTryAgain, btnTryAgainNoData -> {
+                getTagsStatusHistory(getCurrentDateForEdge(), getCurrentDateForEdge())
+            }
+        }
     }
 
 }

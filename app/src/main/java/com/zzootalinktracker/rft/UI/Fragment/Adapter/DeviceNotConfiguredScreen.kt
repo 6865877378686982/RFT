@@ -2,13 +2,11 @@ package com.zzootalinktracker.rft.UI.Fragment.Adapter
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.RelativeLayout
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.zzootalinktracker.android.Ui.Activity.SplashActivity
 import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.Utils.*
@@ -28,7 +26,7 @@ class DeviceNotConfiguredScreen : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_devive_not_configured_screen)
 
         initView()
-        updateUI()
+
 
     }
 
@@ -41,14 +39,14 @@ class DeviceNotConfiguredScreen : AppCompatActivity(), View.OnClickListener {
         deactivatedLayout = findViewById(R.id.deactivatedLayout)
         btnTryAgain = findViewById(R.id.btnTryAgain)
         btnTryAgain.setOnClickListener(this)
-
+        updateUI()
     }
 
     private fun updateUI(){
         val type = intent.extras!!.getInt("type")
         when(type){
             //No Internet
-            1 ->{
+            NO_INTERNET ->{
                 noInternetFoundLayout.visibility = View.VISIBLE
                 noDeviceConfiguredLayout.visibility = View.GONE
                 noDeviceFoundLayout.visibility = View.GONE
@@ -58,7 +56,7 @@ class DeviceNotConfiguredScreen : AppCompatActivity(), View.OnClickListener {
 
             }
             //No Server
-            2 ->{
+            NO_SERVER ->{
                 noInternetFoundLayout.visibility = View.GONE
                 noDeviceConfiguredLayout.visibility = View.GONE
                 noDeviceFoundLayout.visibility = View.GONE
@@ -68,7 +66,7 @@ class DeviceNotConfiguredScreen : AppCompatActivity(), View.OnClickListener {
 
             }
             //DEACTIVE_DEVICE
-            3 ->{
+            DEACTIVE_DEVICE ->{
                 noInternetFoundLayout.visibility = View.GONE
                 noDeviceConfiguredLayout.visibility = View.GONE
                 noDeviceFoundLayout.visibility = View.GONE
@@ -78,17 +76,17 @@ class DeviceNotConfiguredScreen : AppCompatActivity(), View.OnClickListener {
             }
             //DEVICE_NOT_CONFIGURED
 
-            4 -> {
+            DEVICE_NOT_CONFIGURED -> {
                 noInternetFoundLayout.visibility = View.GONE
-                noDeviceConfiguredLayout.visibility = View.GONE
+                noDeviceConfiguredLayout.visibility = View.VISIBLE
                 noDeviceFoundLayout.visibility = View.GONE
                 noServerFoundLayout.visibility = View.GONE
                 noUserConfiguredLayout.visibility = View.GONE
-                deactivatedLayout.visibility = View.VISIBLE
+                deactivatedLayout.visibility = View.GONE
             }
 
          // USER_NOT_CONFIGURED
-            5 -> {
+            USER_NOT_CONFIGURED -> {
                 noInternetFoundLayout.visibility = View.GONE
                 noDeviceConfiguredLayout.visibility = View.GONE
                 noDeviceFoundLayout.visibility = View.GONE
