@@ -151,7 +151,7 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                 val gson = Gson()
                 val model = gson.fromJson(intentData, GetTrailerTagsStatusModel::class.java)
                 if (model.status == SUCCESS_STATUS_EDGE) {
-                    if (model.data.size < 0) {
+                    if (model.data.size > 0) {
                         trailerList.clear()
                         trailerList.addAll(model.data)
                         adapter.notifyDataSetChanged()
