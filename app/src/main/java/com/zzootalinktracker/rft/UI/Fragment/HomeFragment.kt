@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.*
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
@@ -55,6 +56,7 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     private lateinit var viewLayout: View
     private lateinit var tvLastRefreshed: TextView
     private lateinit var tagModelArray: ArrayList<TrailerTagModel>
+    private lateinit var tagModelArrayStored: ArrayList<TrailerTagModel>
     private lateinit var stoedAlertDialog: Dialog
     private lateinit var btnTryAgainNoData: Button
     private var isStoredOrMissing = ""
@@ -93,6 +95,7 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                 tvDriverName.text = "Hey, $driverName"
             }
             tagModelArray = ArrayList()
+            tagModelArrayStored = ArrayList()
             setAdapter()
         } catch (e: Exception) {
             Log.e("HomeFragment", e.message.toString())
@@ -156,19 +159,18 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                         trailerList.addAll(model.data)
                         adapter.notifyDataSetChanged()
                         updateUI(ADAPTER_LAYOUT)
-                        tagModelArray.clear()
                         model.data.forEach {
-
                             try {
                                 if (stoedAlertDialog != null) {
                                     if (stoedAlertDialog.isShowing) {
                                         return
                                     }
-
                                 }
                             } catch (e: Exception) {
 
                             }
+                            tagModelArray.clear()
+
                             var list = ArrayList<TrailerTagModel.Tags>()
 
 
@@ -217,6 +219,9 @@ class HomeFragment() : Fragment(), View.OnClickListener,
             if (requireActivity().isFinishing) {
                 return
             }
+            if (tagModelArray.size <= 0) {
+                return
+            }
             stoedAlertDialog = Dialog(requireActivity())
             stoedAlertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             stoedAlertDialog.setCancelable(true)
@@ -232,7 +237,12 @@ class HomeFragment() : Fragment(), View.OnClickListener,
 
             rvAlertaLayout.adapter = storedAlertAdapter
             saveStoredAlert.setOnClickListener {
-
+                saveStoredAlert.isEnabled = false
+                saveStoredAlert.setBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(), R.color.light_grey
+                    )
+                )
                 var status = true
                 tagModelArray.forEach {
                     it.taglist.forEach {
@@ -243,7 +253,7 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                 }
                 if (status) {
                     sendStoredData()
-                    stoedAlertDialog.dismiss()
+                    stoedAlertDialog.setCancelable(false)
                 } else {
                     Toast.makeText(context, "Please Select the status of tags", Toast.LENGTH_LONG)
                         .show()
@@ -286,6 +296,11 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     private fun sendStoredData() {
 
         if (tagModelArray.size > 0) {
+            if (tagModelArrayStored.size > 0) {
+                return
+            }
+            tagModelArrayStored.clear()
+            tagModelArrayStored = tagModelArray
             val currentTime = Calendar.getInstance().time
             val utcDateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             utcDateTimeFormat.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC time zone
@@ -298,7 +313,7 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                 "N/A"
             }
             val list = ArrayList<AddSpace10XBTDataModel.Data>()
-            var trailerModel = tagModelArray[tagModelArray.size - 1]
+            var trailerModel = tagModelArrayStored[tagModelArrayStored.size - 1]
             trailerModel.taglist.forEach {
                 val updateModel = AddSpace10XBTDataModel.Data(
                     hexadecimalTimestamp, it.tagImei, it.status!!
@@ -316,10 +331,15 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                         response: Response<AddSpace10XBTDataModel>
                     ) {
                         if (response.isSuccessful) {
-                            tagModelArray.removeAt(tagModelArray.size - 1)
-                            if (tagModelArray.size > 0) {
+                            tagModelArrayStored.removeAt(tagModelArray.size - 1)
+                            if (tagModelArrayStored.size > 0) {
                                 sendStoredData()
                             } else {
+                                try{
+                                    stoedAlertDialog.dismiss()
+                                }catch (e:Exception){
+
+                                }
                                 Toast.makeText(
                                     context, "Status successfully Updated", Toast.LENGTH_LONG
                                 ).show()
@@ -327,6 +347,11 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                                 progressBar.visibility = View.GONE
                             }
                         } else {
+                            try{
+                                stoedAlertDialog.dismiss()
+                            }catch (e:Exception){
+
+                            }
                             addFlurryErrorEvents(
                                 "homeFragment",
                                 "RFT/AddSpace10XBTData",
@@ -342,6 +367,11 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                     override fun onFailure(
                         call: Call<AddSpace10XBTDataModel>, t: Throwable
                     ) {
+                        try{
+                            stoedAlertDialog.dismiss()
+                        }catch (e:Exception){
+
+                        }
                         addFlurryErrorEvents(
                             "homeFragment",
                             "RFT/AddSpace10XBTData",
