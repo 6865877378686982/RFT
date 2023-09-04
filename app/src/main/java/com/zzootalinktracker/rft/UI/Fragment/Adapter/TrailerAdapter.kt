@@ -4,10 +4,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.zzootalinktracker.rft.R
-import com.zzootalinktracker.rft.UI.Activity.Model.TrailerModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTagsStatusHistoryModel
 import com.zzootalinktracker.rft.Utils.convertTimeToRFt
-import de.hdodenhof.circleimageview.CircleImageView
 
 class TrailerAdapter(private val mlist: ArrayList<GetTagsStatusHistoryModel.Data>) :
     RecyclerView.Adapter<TrailerAdapter.ViewHolder>() {
@@ -23,11 +21,13 @@ class TrailerAdapter(private val mlist: ArrayList<GetTagsStatusHistoryModel.Data
             var message = item.message
             var dateTimeUserTimeZone = item.dateTimeInUserTimeZone
             tvStatus.text = status
-            if(message!=null){
+            if (message != null) {
                 tvMessage.text = message
             }
-           // tvDateTimeInUtcTime.text = convertTimeToRFt(dateTimeUTC)
-            tvdDateTimeInUserTimeZone.text = convertTimeToRFt(dateTimeUserTimeZone)
+            // tvDateTimeInUtcTime.text = convertTimeToRFt(dateTimeUTC)
+            if (dateTimeUserTimeZone != null) {
+                tvdDateTimeInUserTimeZone.text = convertTimeToRFt(dateTimeUserTimeZone)
+            }
         }
     }
 

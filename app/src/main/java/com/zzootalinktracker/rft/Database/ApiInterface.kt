@@ -68,7 +68,7 @@ interface ApiInterface {
 
     @GET("RFT/TrailerTagsAndStatus")
     fun getTrailerTagsStatus(
-        @Query("Key") Key: String, @Query("RFTDriverId") RFTDriverId: String
+        @Query("RFTDriverId") RFTDriverId: String
     ): Call<GetTrailerTagsStatusModel>
 
 
@@ -79,7 +79,6 @@ interface ApiInterface {
 
     @GET("RFT/TagsStatusHistory")
     fun getTagsStatusHistory(
-        @Query("Key") Key: String,
         @Query("RFTDriverId") RFTDriverId: String,
         @Query("StartDate") StartDate: String,
         @Query("EndDate") EndDate: String

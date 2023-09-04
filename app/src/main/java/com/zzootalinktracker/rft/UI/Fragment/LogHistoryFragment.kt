@@ -205,7 +205,6 @@ class LogHistoryFragment() : Fragment(), SwipeRefreshLayout.OnRefreshListener,
             updateUI(PROGRESS_BAR)
             try {
                 ApiInterface.createForRFT().getTagsStatusHistory(
-                    "$2y" + "$10" + "$4.wpOs8L6jrJTzgbQKvDwexF8FNvwX/FRrFEsvM/avo.ah8gGa1iC",
                     sessionManager.getRftDriverId(),
                     endDate,
                     startDate

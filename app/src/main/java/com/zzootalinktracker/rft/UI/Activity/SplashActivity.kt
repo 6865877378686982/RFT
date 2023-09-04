@@ -166,7 +166,7 @@ class SplashActivity : AppCompatActivity() {
                                 if (response.body()!!.status == SUCCESS_STATUS_EDGE) {
                                     val driverId = response.body()!!.data.driverId
                                     if (driverId != null) {
-                                        sessionManager.saveRftDriverId("005087")
+                                        sessionManager.saveRftDriverId("001398")
                                     }
                                     val firstName = response.body()!!.data.firstName
                                     val lasttName = response.body()!!.data.lastName
