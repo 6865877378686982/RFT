@@ -22,6 +22,7 @@ import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.UI.Activity.MainActivity
 import com.zzootalinktracker.rft.UI.Fragment.Adapter.DeviceNotConfiguredScreen
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetDeviceDriverInfoModel
+import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerIdsHavingCurrentTripNotNullModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call
@@ -36,12 +37,12 @@ class SplashActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
     private lateinit var sessionManagerEmailSave: SessionManagerEmailSave
 
-
     @SuppressLint("MissingInflatedId")
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+      /*  getTrailerIdsHavingCurrentTripNotNull()*/
         initView()
     }
 
@@ -136,11 +137,46 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun checkLoginExist() {
-        rftLogin()
+
+        getTrailerIdsHavingCurrentTripNotNull()
+    }
+
+   private fun getTrailerIdsHavingCurrentTripNotNull() {
+        try {
+            if (isOnline(applicationContext)) {
+                try {
+                    ApiInterface.createForRFT().getTrailerIdsHavingCurrentTripNotNull()
+                        .enqueue(object : Callback<GetTrailerIdsHavingCurrentTripNotNullModel> {
+                            override fun onResponse(
+                                call: Call<GetTrailerIdsHavingCurrentTripNotNullModel>,
+                                response: Response<GetTrailerIdsHavingCurrentTripNotNullModel>
+                            ) {
+                                if (response.isSuccessful){
+                                    var trailerId =response.body()!!.data[1].trailerId
+                                    rftLogin(trailerId)
+                                }
+                            }
+
+                            override fun onFailure(
+                                call: Call<GetTrailerIdsHavingCurrentTripNotNullModel>,
+                                t: Throwable
+                            ) {
+                               t.printStackTrace()
+                            }
+
+                        })
+
+                } catch (e: Exception) {
+
+                }
+            }
+        } catch (e: Exception) {
+
+        }
     }
 
 
-    private fun rftLogin() {
+    private fun rftLogin(trailerId:String) {
         try {
             if (isOnline(applicationContext)) {
                 try {
@@ -150,13 +186,11 @@ class SplashActivity : AppCompatActivity() {
                     var imei = sessionManager.getIMEI()
                     isVersionAbove28 = 1
                     imei = "9d575a53786a98c8"
-                 //   imei = "869196033386166"
-                 /*   imei = "350675293717976"*/
+                    //   imei = "869196033386166"
+                    /*   imei = "350675293717976"*/
 
                     apiInterface.getDeviceDriverInfo(
-                        isVersionAbove28,
-                        if (isVersionAbove28 == 0) imei ?: "" else "",
-                        if (isVersionAbove28 == 1) imei ?: "" else ""
+                        trailerId
                     ).enqueue(object : Callback<GetDeviceDriverInfoModel> {
                         override fun onResponse(
                             call: Call<GetDeviceDriverInfoModel>,
@@ -166,7 +200,7 @@ class SplashActivity : AppCompatActivity() {
                                 if (response.body()!!.status == SUCCESS_STATUS_EDGE) {
                                     val driverId = response.body()!!.data.driverId
                                     if (driverId != null) {
-                                        sessionManager.saveRftDriverId("001398")
+                                        sessionManager.saveRftDriverId(driverId)
                                     }
                                     val firstName = response.body()!!.data.firstName
                                     val lasttName = response.body()!!.data.lastName
@@ -225,7 +259,7 @@ class SplashActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     goToDeviceNotConfiguredScreen(NO_SERVER)
                 }
-            }else{
+            } else {
                 goToDeviceNotConfiguredScreen(NO_INTERNET)
             }
         } catch (e: Exception) {
@@ -242,8 +276,6 @@ class SplashActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
-
 
 
 }
