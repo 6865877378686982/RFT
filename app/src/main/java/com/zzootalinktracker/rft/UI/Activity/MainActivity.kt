@@ -3,11 +3,9 @@ package com.zzootalinktracker.rft.UI.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -15,7 +13,6 @@ import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.Service.GetTrailerTagStatusService
 import com.zzootalinktracker.rft.UI.Fragment.HomeFragment
 import com.zzootalinktracker.rft.UI.Fragment.LogHistoryFragment
-import com.zzootalinktracker.rft.Utils.isOnline
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -78,6 +75,17 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         } catch (e: Exception) {
 
         }
+    }
+
+    override fun onDestroy() {
+        try {
+
+            val myService = Intent(this@MainActivity, GetTrailerTagStatusService::class.java)
+            stopService(myService)
+        }catch (e:Exception){
+
+        }
+        super.onDestroy()
     }
 
     private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {

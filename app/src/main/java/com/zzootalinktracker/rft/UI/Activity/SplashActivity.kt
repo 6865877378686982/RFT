@@ -13,8 +13,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.gson.Gson
 import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.Database.SessionManagerEmailSave
@@ -23,7 +21,6 @@ import com.zzootalinktracker.rft.UI.Activity.MainActivity
 import com.zzootalinktracker.rft.UI.Fragment.Adapter.DeviceNotConfiguredScreen
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetDeviceDriverInfoModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerIdsHavingCurrentTripNotNullModel
-import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerTagsStatusModel
 import com.zzootalinktracker.rft.Utils.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -137,8 +134,8 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun checkLoginExist() {
-
-        getTrailerIdsHavingCurrentTripNotNull()
+        rftLogin("")
+        //  getTrailerIdsHavingCurrentTripNotNull()
     }
 
    private fun getTrailerIdsHavingCurrentTripNotNull() {
@@ -190,7 +187,7 @@ class SplashActivity : AppCompatActivity() {
                     /*   imei = "350675293717976"*/
 
                     apiInterface.getDeviceDriverInfo(
-                        trailerId
+                        isVersionAbove28, imei, imei
                     ).enqueue(object : Callback<GetDeviceDriverInfoModel> {
                         override fun onResponse(
                             call: Call<GetDeviceDriverInfoModel>,

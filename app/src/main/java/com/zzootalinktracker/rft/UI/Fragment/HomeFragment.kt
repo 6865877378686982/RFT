@@ -56,7 +56,7 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     private lateinit var viewLayout: View
     private lateinit var tvLastRefreshed: TextView
     private lateinit var tagModelArray: ArrayList<TrailerTagModel>
-    private lateinit var tagModelArrayStored: ArrayList<TrailerTagModel>
+    private lateinit var tagModelArrayStored: ArrayList<AddSpace10XBTDataModel.TrailersData>
     private lateinit var stoedAlertDialog: Dialog
     private lateinit var btnTryAgainNoData: Button
     private var isStoredOrMissing = ""
@@ -296,11 +296,9 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     private fun sendStoredData() {
 
         if (tagModelArray.size > 0) {
-            if (tagModelArrayStored.size > 0) {
-                return
-            }
             tagModelArrayStored.clear()
-            tagModelArrayStored = tagModelArray
+
+
             val currentTime = Calendar.getInstance().time
             val utcDateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             utcDateTimeFormat.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC time zone
@@ -312,40 +310,40 @@ class HomeFragment() : Fragment(), View.OnClickListener,
             } else {
                 "N/A"
             }
-            val list = ArrayList<AddSpace10XBTDataModel.Data>()
-            var trailerModel = tagModelArrayStored[tagModelArrayStored.size - 1]
-            trailerModel.taglist.forEach {
-                val updateModel = AddSpace10XBTDataModel.Data(
-                    hexadecimalTimestamp, it.tagImei, it.status!!
-                )
-                list.add(updateModel)
+            tagModelArray.forEach {
+                val list = ArrayList<AddSpace10XBTDataModel.Data>()
+                for (i in it.taglist.indices) {
+                    var data = AddSpace10XBTDataModel.Data(
+                        hexadecimalTimestamp, it.taglist[i].tagImei, it.taglist[i].status!!
+                    )
+                    list.add(data)
+                }
+
+                var trailersModel = AddSpace10XBTDataModel.TrailersData(it.imei, list)
+
+                tagModelArrayStored.add(trailersModel)
             }
 
-            var model = AddSpace10XBTDataModel(trailerModel.imei, list)
+           // var model = AddSpace10XBTDataModel(tagModelArrayStored)
             try {
                 ApiInterface.createForRFT().addSpace10XBTData(
-                    "bt_" + "$" + "a*lGdNlIfzcY8h*KidxAoBff*LepB4onmJo1", model
+                    tagModelArrayStored
                 ).enqueue(object : Callback<AddSpace10XBTDataModel> {
                     override fun onResponse(
                         call: Call<AddSpace10XBTDataModel>,
                         response: Response<AddSpace10XBTDataModel>
                     ) {
                         if (response.isSuccessful) {
-                            tagModelArrayStored.removeAt(tagModelArray.size - 1)
-                            if (tagModelArrayStored.size > 0) {
-                                sendStoredData()
-                            } else {
-                                try{
-                                    stoedAlertDialog.dismiss()
-                                }catch (e:Exception){
+                            try {
+                                stoedAlertDialog.dismiss()
+                            } catch (e: Exception) {
 
-                                }
-                                Toast.makeText(
-                                    context, "Status successfully Updated", Toast.LENGTH_LONG
-                                ).show()
-                                /*Hide the progress bar here / dismis dialog here*/
-                                progressBar.visibility = View.GONE
                             }
+                            Toast.makeText(
+                                context, "Status successfully Updated", Toast.LENGTH_LONG
+                            ).show()
+                            /*Hide the progress bar here / dismis dialog here*/
+                            progressBar.visibility = View.GONE
                         } else {
                             try{
                                 stoedAlertDialog.dismiss()
