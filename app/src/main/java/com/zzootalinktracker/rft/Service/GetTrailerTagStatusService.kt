@@ -229,7 +229,7 @@ class GetTrailerTagStatusService : Service() {
                 } catch (e: Exception) {
 
                 }
-            }, 8000)
+            }, 14000)
 
 
 
