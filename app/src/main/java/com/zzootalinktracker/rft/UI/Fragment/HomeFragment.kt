@@ -173,7 +173,6 @@ class HomeFragment() : Fragment(), View.OnClickListener,
 
                             var list = ArrayList<TrailerTagModel.Tags>()
 
-
                             if (!it.tag1 && it.tag1IsMissingOrStored == null) {
                                 list.add(
                                     TrailerTagModel.Tags(

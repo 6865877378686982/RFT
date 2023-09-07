@@ -46,7 +46,7 @@ class GetTrailerTagStatusService : Service() {
 
             hubConnection.on("device_" + sessionManager.getRftDriverId(), { message ->
                 try {
-                    if(message!="Reload Page"){
+                    if(!message.equals("Reload Page")){
                         getTrailesTagsStatus()
                     }else{
                         try {
@@ -229,7 +229,7 @@ class GetTrailerTagStatusService : Service() {
                 } catch (e: Exception) {
 
                 }
-            }, 5000)
+            }, 8000)
 
 
 
