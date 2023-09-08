@@ -29,7 +29,7 @@ class GetTrailerTagStatusService : Service() {
     lateinit var sessionManager: SessionManager
     var handler: Handler? = null
     var runnable: Runnable? = null
-    val REQUEST_TIME = 300000.toLong()
+    val REQUEST_TIME = 40000.toLong()
     val version = Build.VERSION.SDK_INT
 
     val serverUrlSignalR = "wss://admin.zzoota.com/GetTagsNotifications"
