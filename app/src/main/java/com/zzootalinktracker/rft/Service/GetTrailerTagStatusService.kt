@@ -47,9 +47,10 @@ class GetTrailerTagStatusService : Service() {
             hubConnection.on("device_" + sessionManager.getRftDriverId(), { message ->
                 try {
                     if(!message.equals("Reload Page")){
-                        getTrailesTagsStatus()
+                        getTrailesTagsStatus(100)
                     }else{
-                        try {
+                        getTrailesTagsStatus(100)
+                        /*try {
                             if (isOnline(applicationContext)) {
                                 try {
                                     ApiInterface.createForRFT()
@@ -120,12 +121,10 @@ class GetTrailerTagStatusService : Service() {
 
                         } catch (e: Exception) {
 
-                        }
+                        }*/
                     }
-
                 }catch (e:Exception){
-
-                    getTrailesTagsStatus()
+                    getTrailesTagsStatus(100)
                 }
 
             }, String::class.java)
@@ -148,7 +147,7 @@ class GetTrailerTagStatusService : Service() {
 
     }
 
-    private fun getTrailesTagsStatus(){
+    private fun getTrailesTagsStatus(time:Long){
         try {
             /* val manager = LocalBroadcastManager.getInstance(applicationContext)
              val intent1 = Intent()
@@ -229,7 +228,7 @@ class GetTrailerTagStatusService : Service() {
                 } catch (e: Exception) {
 
                 }
-            }, 14000)
+            }, time)
 
 
 
