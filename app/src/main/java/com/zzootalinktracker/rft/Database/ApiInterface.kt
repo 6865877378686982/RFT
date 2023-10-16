@@ -1,5 +1,6 @@
 package com.zzootalinktracker.rft.Database
 
+import com.google.gson.JsonObject
 import com.zzootalinktracker.rft.UI.Activity.Model.*
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetDeviceDriverInfoModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTagsStatusHistoryModel
@@ -20,6 +21,11 @@ interface ApiInterface {
         @Field("imei") imei: String,
         @Field("versionAbove28") versionAbove28: String
     ): retrofit2.Call<LoginModel>
+
+
+    @POST("RFT/PushNotificationUpdateToken")
+    fun pushNotificatiionUpdateToken(@Body postNotificationData: PushNotificationDataModel
+    ): retrofit2.Call<ResponseModel>
 
     companion object {
         fun create(): ApiInterface {

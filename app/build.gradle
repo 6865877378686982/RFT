@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -11,13 +12,13 @@ android {
         applicationId "com.zzootalinktracker.rft"
         minSdk 24
         targetSdk 33
-        versionCode 8
-        versionName "1.0.8"
+        versionCode 11
+        versionName "1.0.11"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
         debug {
-            storeFile file('D:\\ZZoota Projects\\RFT\\app\\rft_jks.jks')
+            storeFile file('C:\\parabhjot Zzota projects\\RFT - 11-Sept-23\\RFT\\app\\rft_jks.jks')
             storePassword 'android'
             keyAlias 'key0'
             keyPassword 'android'
@@ -36,6 +37,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -44,6 +48,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.2.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -65,4 +70,6 @@ dependencies {
     implementation 'com.microsoft.signalr:signalr:5.0.6'
 
 
+    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
 }

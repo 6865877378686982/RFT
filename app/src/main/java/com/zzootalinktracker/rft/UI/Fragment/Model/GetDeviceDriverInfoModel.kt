@@ -12,7 +12,8 @@ class GetDeviceDriverInfoModel(var status: String, var message: String, var data
         var tabletId: String,
         var tabletMobileno: String,
         var androidId: String,
-        var imei: String
+        var imei: String,
+        var token: String
 
     )
 }

@@ -18,6 +18,8 @@ import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.Database.SessionManagerEmailSave
 import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.UI.Activity.MainActivity
+import com.zzootalinktracker.rft.UI.Activity.Model.PushNotificationDataModel
+import com.zzootalinktracker.rft.UI.Activity.Model.ResponseModel
 import com.zzootalinktracker.rft.UI.Fragment.Adapter.DeviceNotConfiguredScreen
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetDeviceDriverInfoModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerIdsHavingCurrentTripNotNullModel
@@ -33,15 +35,18 @@ class SplashActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
     private lateinit var sessionManagerEmailSave: SessionManagerEmailSave
+    val PERMISSION_REQUEST_CODE = 112
 
     @SuppressLint("MissingInflatedId")
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-      /*  getTrailerIdsHavingCurrentTripNotNull()*/
+        /*  getTrailerIdsHavingCurrentTripNotNull()*/
         initView()
+
     }
+
 
     private fun initView() {
         sessionManager = SessionManager(applicationContext)
@@ -53,21 +58,29 @@ class SplashActivity : AppCompatActivity() {
     private fun askRequestsPermission() {
         if (ContextCompat.checkSelfPermission(
                 this@SplashActivity, Manifest.permission.READ_PHONE_STATE
+            ) !== PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
             ) !== PackageManager.PERMISSION_GRANTED
         ) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     this@SplashActivity, Manifest.permission.READ_PHONE_STATE
+                ) && ActivityCompat.shouldShowRequestPermissionRationale(
+                    this@SplashActivity,
+                    Manifest.permission.POST_NOTIFICATIONS
                 )
             ) {
                 ActivityCompat.requestPermissions(
                     this@SplashActivity, arrayOf(
-                        Manifest.permission.READ_PHONE_STATE
+                        Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.POST_NOTIFICATIONS
                     ), 1001
                 )
             } else {
                 ActivityCompat.requestPermissions(
                     this@SplashActivity, arrayOf(
-                        Manifest.permission.READ_PHONE_STATE
+                        Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.POST_NOTIFICATIONS
                     ), 1001
                 )
             }
@@ -138,7 +151,7 @@ class SplashActivity : AppCompatActivity() {
         //  getTrailerIdsHavingCurrentTripNotNull()
     }
 
-   private fun getTrailerIdsHavingCurrentTripNotNull() {
+    private fun getTrailerIdsHavingCurrentTripNotNull() {
         try {
             if (isOnline(applicationContext)) {
                 try {
@@ -148,8 +161,8 @@ class SplashActivity : AppCompatActivity() {
                                 call: Call<GetTrailerIdsHavingCurrentTripNotNullModel>,
                                 response: Response<GetTrailerIdsHavingCurrentTripNotNullModel>
                             ) {
-                                if (response.isSuccessful){
-                                    var trailerId =response.body()!!.data[1].trailerId
+                                if (response.isSuccessful) {
+                                    var trailerId = response.body()!!.data[1].trailerId
                                     rftLogin(trailerId)
                                 }
                             }
@@ -158,7 +171,7 @@ class SplashActivity : AppCompatActivity() {
                                 call: Call<GetTrailerIdsHavingCurrentTripNotNullModel>,
                                 t: Throwable
                             ) {
-                               t.printStackTrace()
+                                t.printStackTrace()
                             }
 
                         })
@@ -173,7 +186,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
 
-    private fun rftLogin(trailerId:String) {
+    private fun rftLogin(trailerId: String) {
         try {
             if (isOnline(applicationContext)) {
                 try {
@@ -210,6 +223,8 @@ class SplashActivity : AppCompatActivity() {
                                     }
                                     sessionManager.saveDriverName(name)
                                     sessionManager.saveLoginTimeStamp(getCurrentDateTime24Hour())
+                                    var token = response.body()!!.data.token
+                                    sessionManager.saveStoredToken(token)
                                     val intent = Intent(
                                         this@SplashActivity, MainActivity::class.java
                                     )

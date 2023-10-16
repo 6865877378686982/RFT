@@ -95,6 +95,15 @@ class SessionManager {
         return data
     }
 
+    public fun saveStoredToken(count: String) {
+        saveStringData("stored_token", count)
+    }
+
+    public fun getStoredToken(): String {
+        val data = getStringData("stored_token")
+        return data
+    }
+
     public fun saveLoginTimeStamp(count: String) {
         saveStringData(LOGIN_TIMESTAMP, count)
     }

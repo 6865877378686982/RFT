@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "945219066059",
+    "project_id": "ron-fine-more",
+    "storage_bucket": "ron-fine-more.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945219066059:android:a94e280d612fb42e93234e",
+        "android_client_info": {
+          "package_name": "com.zzootalinktracker.rft"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEa4sfLwR7mmyMEh_7NuUgmjlMQ6vhUCA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

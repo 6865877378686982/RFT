@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+<ImageView
+    android:id="@+id/app_logo"
+    android:layout_width="70sp"
+    android:layout_marginTop="10sp"
+    android:layout_marginLeft="10sp"
+    android:src="@drawable/ron_finemore_logo"
+    android:layout_height="70sp"/>
+
+<TextView
+    android:id="@+id/title"
+    android:layout_width="wrap_content"
+    android:text="Title"
+    android:textSize="20sp"
+    android:layout_toRightOf="@id/app_logo"
+    android:textStyle="bold"
+    android:layout_marginLeft="10sp"
+    android:layout_marginTop="15sp"
+    android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/message"
+            android:layout_width="wrap_content"
+            android:text="This is Message"
+            android:textSize="20sp"
+            android:layout_below="@id/title"
+            android:textStyle="bold"
+            android:layout_toRightOf="@id/app_logo"
+            android:layout_marginLeft="10sp"
+            android:layout_marginTop="15sp"
+            android:layout_height="wrap_content">
+
+
+</TextView>
+
+    </RelativeLayout>
+
+</RelativeLayout>
