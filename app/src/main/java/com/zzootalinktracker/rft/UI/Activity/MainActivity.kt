@@ -61,25 +61,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         startTrailerTagStatusService()
         sessionManager = SessionManager(applicationContext)
 
-        val storedToken = sessionManager.getStoredToken()
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w(ContentValues.TAG, "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
-            // Get new FCM registration token
-            val token = task.result
 
-            var savedToken = sessionManager.saveStoredToken(token)
-            var driverId = sessionManager.getRftDriverId()
-            /* pushNotificationData(driverId,token)*/
-            pushNotificationData()
-
-            // Log and toast
-            val msg = getString(R.string.msg_token_fmt, token)
-            Log.d(ContentValues.TAG, msg)
-            //      Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-        })
 
     }
 

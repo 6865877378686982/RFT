@@ -2,6 +2,7 @@ package com.zzootalinktracker.android.Ui.Activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -13,6 +14,10 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.Database.SessionManagerEmailSave
@@ -24,6 +29,7 @@ import com.zzootalinktracker.rft.UI.Fragment.Adapter.DeviceNotConfiguredScreen
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetDeviceDriverInfoModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerIdsHavingCurrentTripNotNullModel
 import com.zzootalinktracker.rft.Utils.*
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,7 +52,6 @@ class SplashActivity : AppCompatActivity() {
         initView()
 
     }
-
 
     private fun initView() {
         sessionManager = SessionManager(applicationContext)
@@ -224,12 +229,13 @@ class SplashActivity : AppCompatActivity() {
                                     sessionManager.saveDriverName(name)
                                     sessionManager.saveLoginTimeStamp(getCurrentDateTime24Hour())
                                     var token = response.body()!!.data.token
-                                    sessionManager.saveStoredToken(token)
-                                    val intent = Intent(
-                                        this@SplashActivity, MainActivity::class.java
-                                    )
-                                    startActivity(intent)
-                                    finish()
+                                   /* if(token!=null){
+                                        sessionManager.saveStoredToken(token)
+                                    }else{
+                                        sessionManager.saveStoredToken("")
+                                    }*/
+                                    generateFireBaseToken()
+
                                 } else {
                                     goToDeviceNotConfiguredScreen(DEVICE_NOT_CONFIGURED)
                                     addFlurryErrorEvents(
@@ -287,6 +293,80 @@ class SplashActivity : AppCompatActivity() {
         intent.putExtra("type", type)
         startActivity(intent)
         finish()
+    }
+
+    private fun generateFireBaseToken(){
+        val storedToken = sessionManager.getStoredToken()
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(ContentValues.TAG, "Fetching FCM registration token failed", task.exception)
+                val intent = Intent(
+                    this@SplashActivity, MainActivity::class.java
+                )
+                startActivity(intent)
+                finish()
+                return@OnCompleteListener
+            }
+            // Get new FCM registration token
+            val token = task.result
+
+
+            var driverId = sessionManager.getRftDriverId()
+            /* pushNotificationData(driverId,token)*/
+            try {
+
+
+                val model = PushNotificationDataModel(driverId, token)
+
+                ApiInterface.createForRFT().pushNotificatiionUpdateToken(model)
+                    .enqueue(object : retrofit2.Callback<ResponseModel> {
+                        override fun onResponse(
+                            call: retrofit2.Call<ResponseModel>,
+                            response: retrofit2.Response<ResponseModel>
+                        ) {
+
+                            if (response.isSuccessful) {
+
+
+                            } else {
+
+
+                            }
+                            val intent = Intent(
+                                this@SplashActivity, MainActivity::class.java
+                            )
+                            sessionManager.saveStoredToken(token)
+                            startActivity(intent)
+                            finish()
+                        }
+
+                        override fun onFailure(call: retrofit2.Call<ResponseModel>, t: Throwable) {
+                            val intent = Intent(
+                                this@SplashActivity, MainActivity::class.java
+                            )
+                            startActivity(intent)
+                            finish()
+                        }
+                    })
+
+            } catch (e: Exception) {
+                val intent = Intent(
+                    this@SplashActivity, MainActivity::class.java
+                )
+                startActivity(intent)
+                finish()
+                e.toString()
+            }
+        })
+       /* if(storedToken==""){
+
+        }else{
+            val intent = Intent(
+                this@SplashActivity, MainActivity::class.java
+            )
+            startActivity(intent)
+            finish()
+        }*/
     }
 
 

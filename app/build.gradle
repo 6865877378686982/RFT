@@ -12,13 +12,13 @@ android {
         applicationId "com.zzootalinktracker.rft"
         minSdk 24
         targetSdk 33
-        versionCode 11
-        versionName "1.0.11"
+        versionCode 12
+        versionName "1.0.12"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
         debug {
-            storeFile file('C:\\parabhjot Zzota projects\\RFT - 11-Sept-23\\RFT\\app\\rft_jks.jks')
+            storeFile file('D:\\ZZoota Projects\\RFT\\app\\rft_jks.jks')
             storePassword 'android'
             keyAlias 'key0'
             keyPassword 'android'

@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tvNoServerFound"
             android:gravity="center"
-            android:text="An error occurd while loading! Please try again"
+            android:text="@string/server_stopped"
             android:textColor="@color/black">
 
         </TextView>
