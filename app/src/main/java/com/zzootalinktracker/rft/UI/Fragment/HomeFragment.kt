@@ -1,6 +1,7 @@
 package com.zzootalinktracker.rft.UI.Fragment
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -58,6 +59,7 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     private lateinit var tagModelArray: ArrayList<TrailerTagModel>
     private lateinit var tagModelArrayStored: ArrayList<AddSpace10XBTDataModel.TrailersData>
     private lateinit var stoedAlertDialog: Dialog
+    private lateinit var stoedAlertDialogAfterSave: Dialog
     private lateinit var btnTryAgainNoData: Button
     private var isStoredOrMissing = ""
     private var macAddress = ""
@@ -70,7 +72,7 @@ class HomeFragment() : Fragment(), View.OnClickListener,
 
         viewLayout = inflater.inflate(R.layout.fragment_home, container, false)
         initView()
-
+        //  showStoredAlertAfterSaving()
 
 
         return viewLayout
@@ -110,18 +112,21 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                 dataNotFoundhome.visibility = View.GONE
                 noServerFoundhome.visibility = View.GONE
             }
+
             NO_DATA_FOUND -> {
                 progressBar.visibility = View.GONE
                 scrollView.visibility = View.GONE
                 noServerFoundhome.visibility = View.GONE
                 dataNotFoundhome.visibility = View.VISIBLE
             }
+
             PROGRESS_BAR -> {
                 progressBar.visibility = View.VISIBLE
                 scrollView.visibility = View.GONE
                 noServerFoundhome.visibility = View.GONE
                 dataNotFoundhome.visibility = View.GONE
             }
+
             NO_SERVER -> {
                 progressBar.visibility = View.GONE
                 scrollView.visibility = View.GONE
@@ -159,20 +164,18 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                         trailerList.addAll(model.data)
                         adapter.notifyDataSetChanged()
                         updateUI(ADAPTER_LAYOUT)
-                        model.data.forEach {
-                            try {
-                                if (stoedAlertDialog != null) {
-                                    if (stoedAlertDialog.isShowing) {
-                                        return
-                                    }
+                      /*  try {
+                            if (stoedAlertDialog != null) {
+                                if(!stoedAlertDialog.isShowing){
+                                    tagModelArray.clear()
                                 }
-                            } catch (e: Exception) {
-
                             }
-                            tagModelArray.clear()
+                        } catch (e: Exception) {
 
+                        }*/
+                        tagModelArray.clear()
+                        model.data.forEach {
                             var list = ArrayList<TrailerTagModel.Tags>()
-
                             if (!it.tag1 && it.tag1IsMissingOrStored == null) {
                                 list.add(
                                     TrailerTagModel.Tags(
@@ -187,18 +190,40 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                                     )
                                 )
                             }
+
                             if (list.size > 0) {
-                                if (it.imei == "2302210003E9") {
-                                    val model = TrailerTagModel(
-                                        it.trailerId, it.trailerName, it.imei, list
-                                    )
-                                    tagModelArray.add(model)
+                                val model = TrailerTagModel(
+                                    it.trailerId, it.trailerName, it.imei, list
+                                )
+                                tagModelArray.add(model)
+                            }
+                        }
+                        if(tagModelArray.size>0){
+                            try {
+                                if (stoedAlertDialog != null) {
+                                    if(stoedAlertDialog.isShowing){
+                                       storedAlertAdapter.notifyDataSetChanged()
+                                    }else{
+                                        showStoredAlert()
+                                    }
+                                }else{
                                     showStoredAlert()
                                 }
+                            } catch (e: Exception) {
+                                showStoredAlert()
+                            }
+                        }else{
+                            try {
+                                if (stoedAlertDialog != null) {
+                                    if(stoedAlertDialog.isShowing){
+                                        stoedAlertDialog.dismiss()
+                                    }
+                                }
+                            } catch (e: Exception) {
 
                             }
-
                         }
+
                     } else {
                         updateUI(NO_DATA_FOUND)
                     }
@@ -264,6 +289,35 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     }
 
 
+    private fun showStoredAlertAfterSaving(msg : String) {
+        try {
+            if (requireActivity().isFinishing) {
+                return
+            }
+            stoedAlertDialogAfterSave = Dialog(requireActivity())
+            stoedAlertDialogAfterSave.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            stoedAlertDialogAfterSave.setCancelable(true)
+
+            // Inflate the custom layout
+            stoedAlertDialogAfterSave.setContentView(R.layout.alert_msg_after_saving)
+            val tvAfterSaveMsg = stoedAlertDialogAfterSave.findViewById(R.id.tvAfterSaveText) as TextView
+            val btnOkAfterSave = stoedAlertDialogAfterSave.findViewById(R.id.btnOkAfterSave) as Button
+            btnOkAfterSave.setOnClickListener {
+                stoedAlertDialogAfterSave.dismiss()
+
+
+            }
+            tvAfterSaveMsg.text = msg
+            stoedAlertDialogAfterSave.window!!.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            stoedAlertDialogAfterSave.show()
+        } catch (e: Exception) {
+            // Handle any exceptions that may occur
+        }
+    }
+
+
     override fun onResume() {
         super.onResume()
     }
@@ -297,7 +351,6 @@ class HomeFragment() : Fragment(), View.OnClickListener,
         if (tagModelArray.size > 0) {
             tagModelArrayStored.clear()
 
-
             val currentTime = Calendar.getInstance().time
             val utcDateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             utcDateTimeFormat.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC time zone
@@ -323,66 +376,79 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                 tagModelArrayStored.add(trailersModel)
             }
 
-           // var model = AddSpace10XBTDataModel(tagModelArrayStored)
+            // var model = AddSpace10XBTDataModel(tagModelArrayStored)
             try {
-                ApiInterface.createForRFT().addSpace10XBTData(
-                    tagModelArrayStored
-                ).enqueue(object : Callback<AddSpace10XBTDataModel> {
-                    override fun onResponse(
-                        call: Call<AddSpace10XBTDataModel>,
-                        response: Response<AddSpace10XBTDataModel>
-                    ) {
-                        if (response.isSuccessful) {
+                ApiInterface.createForRFT().addSpace10XBTData(tagModelArrayStored)
+                    .enqueue(object : Callback<AddSpace10XBTDataModel> {
+                        override fun onResponse(
+                            call: Call<AddSpace10XBTDataModel>,
+                            response: Response<AddSpace10XBTDataModel>
+                        ) {
+                            if (response.isSuccessful) {
+                                try {
+                                    stoedAlertDialog.dismiss()
+                                    var isMissingFound = false
+                                    tagModelArrayStored.forEach { tagModel ->
+                                        tagModel.devices.forEach { device ->
+                                            if (device.isStoredOrMissing == "MISSING") {
+                                                isMissingFound = true
+                                            }
+                                        }
+                                    }
+
+                                    if (isMissingFound) {
+                                        showStoredAlertAfterSaving("If safe to do so, and if it is an option, please return to collect your chiller Pad. If it is not safe to collect your chiller Pad, please notify your supervisor")
+                                    } else {
+                                        showStoredAlertAfterSaving("Thank you for confirming you've safely stored your chiller pad.")
+                                    }
+                                } catch (e: Exception) {
+                                    // Handle exceptions if needed
+                                }
+                                Toast.makeText(
+                                    context, "Status successfully Updated", Toast.LENGTH_LONG
+                                ).show()
+                                /*Hide the progress bar here / dismiss dialog here*/
+                                progressBar.visibility = View.GONE
+                            } else {
+                                try {
+
+                                    stoedAlertDialog.dismiss()
+                                } catch (e: Exception) {
+                                    // Handle exceptions if needed
+                                }
+                                addFlurryErrorEvents(
+                                    "homeFragment",
+                                    "RFT/AddSpace10XBTData",
+                                    sessionManager.getIMEI(),
+                                    version.toString(),
+                                    response.message(),
+                                    "apiUnsuccess"
+                                )
+                            }
+                        }
+
+                        override fun onFailure(
+                            call: Call<AddSpace10XBTDataModel>, t: Throwable
+                        ) {
                             try {
                                 stoedAlertDialog.dismiss()
                             } catch (e: Exception) {
-
-                            }
-                            Toast.makeText(
-                                context, "Status successfully Updated", Toast.LENGTH_LONG
-                            ).show()
-                            /*Hide the progress bar here / dismis dialog here*/
-                            progressBar.visibility = View.GONE
-                        } else {
-                            try{
-                                stoedAlertDialog.dismiss()
-                            }catch (e:Exception){
-
+                                // Handle exceptions if needed
                             }
                             addFlurryErrorEvents(
                                 "homeFragment",
                                 "RFT/AddSpace10XBTData",
                                 sessionManager.getIMEI(),
                                 version.toString(),
-                                response.message(),
-                                "apiUnsuccess"
+                                t.message.toString(),
+                                "apiFailure"
                             )
-
                         }
-                    }
-
-                    override fun onFailure(
-                        call: Call<AddSpace10XBTDataModel>, t: Throwable
-                    ) {
-                        try{
-                            stoedAlertDialog.dismiss()
-                        }catch (e:Exception){
-
-                        }
-                        addFlurryErrorEvents(
-                            "homeFragment",
-                            "RFT/AddSpace10XBTData",
-                            sessionManager.getIMEI(),
-                            version.toString(),
-                            t.message.toString(),
-                            "apiFailure"
-                        )
-                    }
-
-                })
+                    })
             } catch (e: Exception) {
-
+                // Handle exceptions if needed
             }
+
         }
 
     }
