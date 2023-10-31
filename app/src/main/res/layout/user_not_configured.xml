@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="@color/red_rft"
+    android:background="@color/white"
+    android:gravity="center"
+    android:orientation="vertical"
     android:layout_height="match_parent">
 
     <ImageView
         android:id="@+id/ivNoWifi"
-        android:layout_width="250sp"
-        android:layout_height="250sp"
+        android:layout_width="100sp"
+        android:layout_height="100sp"
         android:layout_centerInParent="true"
-        android:src="@drawable/no_user_found" />
+        android:src="@drawable/no_user_found_latest" />
 
     <TextView
         android:layout_below="@id/ivNoWifi"
-        android:layout_marginTop="30sp"
-        style="@style/black_bold_24sp"
+        android:layout_marginTop="8sp"
+        style="@style/black_bold_16sp"
         android:gravity="center"
-        android:textColor="@color/white"
+        android:layout_marginHorizontal="10sp"
+        android:textColor="@color/black"
         android:text="@string/user_not_configured"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -25,4 +28,4 @@
     </TextView>
 
 
-</RelativeLayout>
+</LinearLayout>

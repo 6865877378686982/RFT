@@ -20,10 +20,9 @@ var BASE_URL = "http://20.211.59.130/api/"
 
 var BASE_URL_RFT = "https://admin.zzoota.com/api/"
 
+var LIVE_BUILD = true
+
 const val LOGIN_TIMESTAMP = "logintimestamp"
-const val API_HASH = "api_hash"
-const val DEVICE_ID = "device_id"
-const val USER_ID = "user_id"
 const val RFT_DRIVER_ID = "rft_driver_id"
 const val IMEI_ID = "IMEI_ID"
 const val ANDROID_ID = "android_id"

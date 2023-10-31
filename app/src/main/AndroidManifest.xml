@@ -46,7 +46,7 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/red_rft" />
         <activity
-            android:name=".UI.Fragment.Adapter.DeviceNotConfiguredScreen"
+            android:name=".UI.Activity.DeviceNotConfiguredScreen"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

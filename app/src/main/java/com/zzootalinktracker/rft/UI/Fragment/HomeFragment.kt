@@ -60,7 +60,6 @@ class HomeFragment() : Fragment(), View.OnClickListener,
     private lateinit var stoedAlertDialog: Dialog
     private lateinit var btnTryAgainNoData: Button
     private var isStoredOrMissing = ""
-    private var macAddress = ""
     private val version = Build.VERSION.SDK_INT
 
     @SuppressLint("MissingInflatedId")
@@ -70,9 +69,6 @@ class HomeFragment() : Fragment(), View.OnClickListener,
 
         viewLayout = inflater.inflate(R.layout.fragment_home, container, false)
         initView()
-
-
-
         return viewLayout
     }
 
@@ -188,13 +184,13 @@ class HomeFragment() : Fragment(), View.OnClickListener,
                                 )
                             }
                             if (list.size > 0) {
-                                if (it.imei == "2302210003E9") {
+                              //  if (it.imei == "2302210003E9") {
                                     val model = TrailerTagModel(
                                         it.trailerId, it.trailerName, it.imei, list
                                     )
                                     tagModelArray.add(model)
                                     showStoredAlert()
-                                }
+                                //  }
 
                             }
 

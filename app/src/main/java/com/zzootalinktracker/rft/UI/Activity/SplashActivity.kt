@@ -16,8 +16,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import com.zzootalinktracker.rft.Database.ApiInterface
 import com.zzootalinktracker.rft.Database.SessionManager
 import com.zzootalinktracker.rft.Database.SessionManagerEmailSave
@@ -25,11 +23,10 @@ import com.zzootalinktracker.rft.R
 import com.zzootalinktracker.rft.UI.Activity.MainActivity
 import com.zzootalinktracker.rft.UI.Activity.Model.PushNotificationDataModel
 import com.zzootalinktracker.rft.UI.Activity.Model.ResponseModel
-import com.zzootalinktracker.rft.UI.Fragment.Adapter.DeviceNotConfiguredScreen
+import com.zzootalinktracker.rft.UI.Activity.DeviceNotConfiguredScreen
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetDeviceDriverInfoModel
 import com.zzootalinktracker.rft.UI.Fragment.Model.GetTrailerIdsHavingCurrentTripNotNullModel
 import com.zzootalinktracker.rft.Utils.*
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -196,15 +193,18 @@ class SplashActivity : AppCompatActivity() {
             if (isOnline(applicationContext)) {
                 try {
                     val version = Build.VERSION.SDK_INT
-                    var isVersionAbove28 = if (version < Build.VERSION_CODES.Q) 0 else 1
+                    val isVersionAbove28 = if (version < Build.VERSION_CODES.Q) 0 else 1
                     val apiInterface = ApiInterface.createForRFT()
                     var imei = sessionManager.getIMEI()
-                    isVersionAbove28 = 1
-                    imei = "9d575a53786a98c8"
-                    //   imei = "869196033386166"
-                    /*   imei = "350675293717976"*/
+                     imei = "d9c1133043a81b06"
 
-                    apiInterface.getDeviceDriverInfo(
+                    var apiPath = ""
+                    if (LIVE_BUILD)
+                        apiPath = "GetDeviceDriverInfoLive"
+                    else
+                        apiPath = "GetDeviceDriverInfo"
+
+                    apiInterface.getDeviceDriverInfo(apiPath,
                         isVersionAbove28, imei, imei
                     ).enqueue(object : Callback<GetDeviceDriverInfoModel> {
                         override fun onResponse(
@@ -312,10 +312,7 @@ class SplashActivity : AppCompatActivity() {
 
 
             var driverId = sessionManager.getRftDriverId()
-            /* pushNotificationData(driverId,token)*/
             try {
-
-
                 val model = PushNotificationDataModel(driverId, token)
 
                 ApiInterface.createForRFT().pushNotificatiionUpdateToken(model)
@@ -358,15 +355,6 @@ class SplashActivity : AppCompatActivity() {
                 e.toString()
             }
         })
-       /* if(storedToken==""){
-
-        }else{
-            val intent = Intent(
-                this@SplashActivity, MainActivity::class.java
-            )
-            startActivity(intent)
-            finish()
-        }*/
     }
 
 

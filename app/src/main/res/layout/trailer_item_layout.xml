@@ -6,18 +6,17 @@
     android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10sp"
+        android:layout_margin="8sp"
         android:backgroundTint="@color/light_grey_rft"
-        app:cardCornerRadius="15sp">
+        app:cardCornerRadius="10sp">
 
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10sp">
+            android:padding="8sp">
 
 
             <LinearLayout
@@ -49,14 +48,6 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="" />
-
-                <!--                <TextView-->
-                <!--                    android:id="@+id/tvDateTimeInUtcTime"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:gravity="center"-->
-                <!--                    android:text="Current Time Date"/>-->
-
 
             </LinearLayout>
 

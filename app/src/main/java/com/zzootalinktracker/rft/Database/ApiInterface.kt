@@ -91,8 +91,9 @@ interface ApiInterface {
 
     ): Call<GetTagsStatusHistoryModel>
 
-    @GET("RFT/GetDeviceDriverInfo")
+    @GET("RFT/{apiPath}")
     fun getDeviceDriverInfo(
+        @Path("apiPath")  apiPath:String,
         @Query("Version") Version: Int,
         @Query("IMEI") IMEI: String,
         @Query("AndroidId") AndroidId: String
